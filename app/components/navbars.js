@@ -1,17 +1,17 @@
 'use client';
 //import Cookies from 'js-cookie';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 //import { destroyCookie } from 'nookies';
 import { useState } from 'react';
 //import { isTokenValid } from "../utils/auth";
 
 const Navbar = () => {
   const pathname = usePathname();
-  const router = useRouter();
+  // const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
+  // const [isLoggedIn, setIsLoggedIn] = useState(false);
+  // const [isAdmin, setIsAdmin] = useState(false);
 
   // useEffect(() => {
   //   const checkLoginStatus = () => {
@@ -39,22 +39,22 @@ const Navbar = () => {
   //   };
   // }, [pathname]);
 
-  const handleLogout = () => {
-    const role = Cookies.get('userRole') || localStorage.getItem('userRole');
+  // const handleLogout = () => {
+  //   const role = Cookies.get('userRole') || localStorage.getItem('userRole');
 
-    localStorage.removeItem('token');
-    localStorage.removeItem('userRole');
-    Cookies.remove('access_token');
-    Cookies.remove('userRole');
-    destroyCookie(null, 'access_token', { path: '/' });
-    destroyCookie(null, 'userRole', { path: '/' });
+  //   localStorage.removeItem('token');
+  //   localStorage.removeItem('userRole');
+  //   Cookies.remove('access_token');
+  //   Cookies.remove('userRole');
+  //   destroyCookie(null, 'access_token', { path: '/' });
+  //   destroyCookie(null, 'userRole', { path: '/' });
 
-    if (role === 'admin') {
-      window.location.href = '/adminur'; // অ্যাডমিন লগআউট হলে এ্যাডমিন লগইন পেজে যাবে
-    } else {
-      window.location.href = '/login'; // সাধারন ইউজার হলে নরমাল লগইন পেজে যাবে
-    }
-  };
+  //   if (role === 'admin') {
+  //     window.location.href = '/adminur'; // অ্যাডমিন লগআউট হলে এ্যাডমিন লগইন পেজে যাবে
+  //   } else {
+  //     window.location.href = '/login'; // সাধারন ইউজার হলে নরমাল লগইন পেজে যাবে
+  //   }
+  // };
 
   const createWaveEffect = (text) =>
     text.split('').map((char, index) => (
