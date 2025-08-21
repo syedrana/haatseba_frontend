@@ -10,7 +10,7 @@ const Navbar = () => {
   const pathname = usePathname();
   // const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  // const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   // const [isAdmin, setIsAdmin] = useState(false);
 
   // useEffect(() => {
