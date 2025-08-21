@@ -1,26 +1,22 @@
-import CallToAction from './components/home/callAction';
-import Courses from './components/home/courses';
-import FaqSection from './components/home/faqSection';
-import WhyChooseUs from './components/home/features';
-import Hero from './components/home/heroSection';
 
 export default function Home() {
   return (
     <div className="bg-white text-blue-900">
+      <h1 className="min-h-lvh text-9xl max-w-7xl mx-auto mt-20 text-center">Welcome to Haat Seba</h1>
       {/* Hero Section */}
-      <Hero />
+      {/* <Hero /> */}
 
       {/* Course Offerings Section */}
-      <Courses />
+      {/* <Courses /> */}
 
       {/* Features Section */}
-      <WhyChooseUs />
+      {/* <WhyChooseUs /> */}
 
       {/* FAQ Section */}
-      <FaqSection />
+      {/* <FaqSection /> */}
 
       {/* Call to Action Section */}
-      <CallToAction />
+      {/* <CallToAction /> */}
     </div>
   );
 }

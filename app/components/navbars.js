@@ -1,11 +1,10 @@
 'use client';
-import Cookies from 'js-cookie';
-import Image from 'next/image';
+//import Cookies from 'js-cookie';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { destroyCookie } from 'nookies';
-import { useEffect, useState } from 'react';
-import { isTokenValid } from "../utils/auth";
+//import { destroyCookie } from 'nookies';
+import { useState } from 'react';
+//import { isTokenValid } from "../utils/auth";
 
 const Navbar = () => {
   const pathname = usePathname();
@@ -14,31 +13,31 @@ const Navbar = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
 
-  useEffect(() => {
-    const checkLoginStatus = () => {
-      const token = localStorage.getItem("token");
-      const role = localStorage.getItem('userRole');
-      if (token && isTokenValid()) {
-        setIsLoggedIn(true);
-        setIsAdmin(role === 'admin');
-      } else {
-        setIsLoggedIn(false);
-        setIsAdmin(false);
-        localStorage.removeItem("token");
-        localStorage.removeItem("userRole");
-      } 
-    };
-    if (pathname) {
-      checkLoginStatus();
-    }
-    // Listen to storage events (e.g., logout in another tab)
-    const handleStorageChange = () => checkLoginStatus();
-    window.addEventListener("storage", handleStorageChange);
+  // useEffect(() => {
+  //   const checkLoginStatus = () => {
+  //     const token = localStorage.getItem("token");
+  //     const role = localStorage.getItem('userRole');
+  //     if (token && isTokenValid()) {
+  //       setIsLoggedIn(true);
+  //       setIsAdmin(role === 'admin');
+  //     } else {
+  //       setIsLoggedIn(false);
+  //       setIsAdmin(false);
+  //       localStorage.removeItem("token");
+  //       localStorage.removeItem("userRole");
+  //     } 
+  //   };
+  //   if (pathname) {
+  //     checkLoginStatus();
+  //   }
+  //   // Listen to storage events (e.g., logout in another tab)
+  //   const handleStorageChange = () => checkLoginStatus();
+  //   window.addEventListener("storage", handleStorageChange);
 
-    return () => {
-      window.removeEventListener("storage", handleStorageChange);
-    };
-  }, [pathname]);
+  //   return () => {
+  //     window.removeEventListener("storage", handleStorageChange);
+  //   };
+  // }, [pathname]);
 
   const handleLogout = () => {
     const role = Cookies.get('userRole') || localStorage.getItem('userRole');
@@ -82,17 +81,18 @@ const Navbar = () => {
                   : '/'
               }
             >
-              <div className="relative w-40 h-40 sm:w-48 sm:h-48 md:w-56 md:h-56 lg:w-64 lg:h-64 xl:w-72 xl:h-72">
+              {/* <div className="relative w-40 h-40 sm:w-48 sm:h-48 md:w-56 md:h-56 lg:w-64 lg:h-64 xl:w-72 xl:h-72">
                 <Image
-                  src="/trust1x.png"
+                  src="/vercel.svg"
                   alt="Logo"
                   fill
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 200px"
                   className="object-contain"
                   priority={true}
                 />
-              </div>
+              </div> */}
               {/* <Image src="/trust1x.png" alt="Trust1x Logo" width={100} height={100} /> */}
+              <h1 className="text-4xl">Haat Seba</h1>
             </Link>
           </div>
           <div className="flex items-center md:hidden">

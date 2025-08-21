@@ -1,6 +1,6 @@
 'use client';
 
-import axios from 'axios';
+//import axios from 'axios';
 import { motion } from 'framer-motion';
 import { Mail, Phone } from 'lucide-react';
 import { useState } from 'react';
@@ -85,9 +85,9 @@ export default function ContactSection() {
           viewport={{ once: true }}
         >
           <h2 className="text-4xl font-bold text-gray-800 mb-6">Get in Touch</h2>
-          <p className="text-gray-600 mb-4">
+          {/* <p className="text-gray-600 mb-4">
             We'd love to hear from you! Reach out through the form or use the contact info below.
-          </p>
+          </p> */}
 
           <div className="space-y-4">
             <div className="flex items-center gap-3 text-gray-700">
