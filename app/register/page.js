@@ -245,14 +245,16 @@ export default function RegisterForm() {
         },
       };
 
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE}/registration`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: process.env.NEXT_PUBLIC_API_KEY || "",
-        },
-        body: JSON.stringify(payload),
-      });
+      const res = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_BASE}/registration`,
+        {
+          headers: {
+            Authorization: process.env.NEXT_PUBLIC_API_KEY,
+            "Content-Type": "multipart/form-data",
+          },
+          body: JSON.stringify(payload),
+        }
+      );
 
       let data = null;
       try {
