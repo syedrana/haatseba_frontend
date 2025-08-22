@@ -137,6 +137,84 @@ export default function RegisterForm() {
     return e;
   };
 
+  // const onSubmit = async (e) => {
+  //   e.preventDefault();
+  //   const eMap = validate();
+  //   if (Object.keys(eMap).length) {
+  //     setErrors(eMap);
+  //     return;
+  //   }
+  //   setErrors({});
+  //   setSubmitting(true);
+
+  //   try {
+  //     // convert image to base64 string for controller
+  //     const imageBase64 = await fileToBase64(imgFile);
+
+  //     // build payload exactly like your controller expects
+  //     const payload = {
+  //       firstName: form.firstName.trim(),
+  //       lastName: form.lastName.trim(),
+  //       email: form.email.trim().toLowerCase(),
+  //       phone: form.phone.trim(),
+  //       password: form.password, // controller hashes it
+  //       image: imageBase64, // required string (base64)
+  //       address: form.address.trim(),
+  //       referralCode: form.referralCode?.trim() || "",
+  //       nominee: {
+  //         firstName: form.nomineeFirstName.trim(),
+  //         lastName: form.nomineeLastName.trim(),
+  //         relation: form.nomineeRelation.trim(), // should match enum
+  //         phone: form.nomineePhone.trim(),
+  //       },
+  //     };
+
+  //     const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE}/registration`,
+  //       {
+  //         method: "POST",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //           Authorization: process.env.NEXT_PUBLIC_API_KEY || "", // secureApi middleware
+  //         },
+  //         body: JSON.stringify(payload),
+  //       }
+  //     );
+
+  //     const data = await res.json();
+
+  //     if (!res.ok) {
+  //       // common duplicate errors, validation messages from backend
+  //       setErrors((p) => ({ ...p, submit: data?.message || "Registration failed" }));
+  //     } else {
+  //       // success
+  //       alert("User registered successfully. Please verify your email.");
+  //       // reset
+  //       setForm({
+  //         firstName: "",
+  //         lastName: "",
+  //         email: "",
+  //         phone: "",
+  //         password: "",
+  //         confirmPassword: "",
+  //         address: "",
+  //         referralCode: "",
+  //         nomineeFirstName: "",
+  //         nomineeLastName: "",
+  //         nomineeRelation: "",
+  //         nomineePhone: "",
+  //       });
+  //       setImgFile(null);
+  //       setPreview(null);
+  //     }
+  //   } catch (err) {
+  //     console.log(err);
+  //     setErrors((p) => ({ ...p, submit: "Network error. Try again." }));
+  //   } finally {
+  //     setSubmitting(false);
+  //   }
+  // };
+
+
   const onSubmit = async (e) => {
     e.preventDefault();
     const eMap = validate();
@@ -148,71 +226,75 @@ export default function RegisterForm() {
     setSubmitting(true);
 
     try {
-      // convert image to base64 string for controller
       const imageBase64 = await fileToBase64(imgFile);
 
-      // build payload exactly like your controller expects
       const payload = {
         firstName: form.firstName.trim(),
         lastName: form.lastName.trim(),
         email: form.email.trim().toLowerCase(),
         phone: form.phone.trim(),
-        password: form.password, // controller hashes it
-        image: imageBase64, // required string (base64)
+        password: form.password,
+        image: imageBase64,
         address: form.address.trim(),
         referralCode: form.referralCode?.trim() || "",
         nominee: {
           firstName: form.nomineeFirstName.trim(),
           lastName: form.nomineeLastName.trim(),
-          relation: form.nomineeRelation.trim(), // should match enum
+          relation: form.nomineeRelation.trim(),
           phone: form.nomineePhone.trim(),
         },
       };
 
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE}/registration`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": process.env.NEXT_PUBLIC_API_KEY || "", // secureApi middleware
-          },
-          body: JSON.stringify(payload),
-        }
-      );
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE}/registration`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": process.env.NEXT_PUBLIC_API_KEY || "",
+        },
+        body: JSON.stringify(payload),
+      });
 
-      const data = await res.json();
+      let data = null;
+      try {
+        data = await res.json();
+      } catch (err) {
+        console.warn("❌ Response is not JSON");
+      }
 
       if (!res.ok) {
-        // common duplicate errors, validation messages from backend
-        setErrors((p) => ({ ...p, submit: data?.message || "Registration failed" }));
-      } else {
-        // success
-        alert("User registered successfully. Please verify your email.");
-        // reset
-        setForm({
-          firstName: "",
-          lastName: "",
-          email: "",
-          phone: "",
-          password: "",
-          confirmPassword: "",
-          address: "",
-          referralCode: "",
-          nomineeFirstName: "",
-          nomineeLastName: "",
-          nomineeRelation: "",
-          nomineePhone: "",
-        });
-        setImgFile(null);
-        setPreview(null);
+        const msg = data?.message || `Request failed with status ${res.status}`;
+        setErrors((p) => ({ ...p, submit: msg }));
+        return;
       }
+
+      alert("User registered successfully. Please verify your email.");
+
+      // reset form
+      setForm({
+        firstName: "",
+        lastName: "",
+        email: "",
+        phone: "",
+        password: "",
+        confirmPassword: "",
+        address: "",
+        referralCode: "",
+        nomineeFirstName: "",
+        nomineeLastName: "",
+        nomineeRelation: "",
+        nomineePhone: "",
+      });
+      setImgFile(null);
+      setPreview(null);
+
     } catch (err) {
-      console.log(err);
+      console.error(err);
       setErrors((p) => ({ ...p, submit: "Network error. Try again." }));
     } finally {
       setSubmitting(false);
     }
   };
+
 
   const strength = passStrong(form.password);
   const strengthBar = ["bg-red-500", "bg-orange-500", "bg-yellow-400", "bg-green-500"][strength - 1] || "bg-gray-200";
