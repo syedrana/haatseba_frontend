@@ -47,11 +47,11 @@ const Footer = () => {
         <div className="mt-8 border-t border-gray-700 pt-4 text-center text-xs sm:text-sm">
           © 2024 AI Point. All rights reserved.
           <div className="mt-4">
-            <Link href="/privacy-policy">
+            <Link href="">
               Privacy Policy
             </Link>
             <span className="mx-2">|</span>
-            <Link href="/terms-of-service">
+            <Link href="">
               Terms of Service
             </Link>
           </div>
