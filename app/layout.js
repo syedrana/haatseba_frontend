@@ -1,3 +1,5 @@
+//'use client';
+
 import { Geist, Geist_Mono } from "next/font/google";
 import Footer from "./components/footer";
 import MoveToTopButton from './components/MoveToTopButton';

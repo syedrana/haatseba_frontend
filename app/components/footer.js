@@ -1,5 +1,4 @@
-// components/Footer.js
-"use client";  // This makes the component a Client Component
+"use client"; 
 
 import Image from 'next/image'; // Correctly import the Next.js Image component
 import Link from 'next/link';
