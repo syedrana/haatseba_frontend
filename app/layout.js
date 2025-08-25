@@ -1,9 +1,5 @@
-//'use client';
-
 import { Geist, Geist_Mono } from "next/font/google";
-import Footer from "./components/footer";
-import MoveToTopButton from './components/MoveToTopButton';
-import Navbar from "./components/navbars";
+import ClientRootWrapper from './ClientRootWrapper';
 import "./globals.css";
 
 const geistSans = Geist({
@@ -47,15 +43,12 @@ export const metadata = {
 };
 
 export default function RootLayout({ children }) {
+  
+
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        <Navbar/>
-        {children}
-        <MoveToTopButton /> {/* "Move to Top" বাটন */}
-        <Footer/>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        <ClientRootWrapper>{children}</ClientRootWrapper>
       </body>
     </html>
   );
