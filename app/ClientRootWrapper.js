@@ -6,7 +6,8 @@ import Navbar from './components/navbars';
 
 export default function ClientRootWrapper({ children }) {
   const pathname = usePathname();
-  const showNavbar = !pathname.startsWith('/dashboard');
+  const showNavbar = !pathname.startsWith('/dashboard') && !pathname.startsWith('/admin');
+  // const showNavbar = !pathname.startsWith('/admin');
 
   return (
     <>

@@ -7,7 +7,7 @@ import { isTokenValid } from "../utils/auth";
 
 export default function Login() {
   const [formData, setFormData] = useState({
-    name: "",
+    username: "",
     password: "",
   });
 
@@ -25,23 +25,24 @@ export default function Login() {
   }, [router]); // ✅ router dependency added
 
   const handleChange = (e) => {
-    const { name, value } = e.target || {}; // ✅ Optional chaining fallback
+    const { name, value } = e.target; // ← এখানে name নিতে হবে
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
   };
 
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/adminLogin`,
+        `${process.env.NEXT_PUBLIC_API_BASE}/adminLogin`,
         formData,
         {
           headers: {
-            Authorization: process.env.NEXT_PUBLIC_API_AUTH,
+            Authorization: process.env.NEXT_PUBLIC_API_KEY,
           },
           withCredentials: true, // ✅ Allow cookies with API call
         }
@@ -52,7 +53,7 @@ export default function Login() {
       localStorage.setItem("token", access_token);
       localStorage.setItem("userRole", role);
 
-      setFormData({ name: "", password: "" });
+      setFormData({ username: "", password: "" });
 
       setError("");
 
@@ -84,8 +85,8 @@ export default function Login() {
             <label className="block text-gray-700 font-semibold">Admin Name</label>
             <input
               type="text"
-              name="name"
-              value={formData.name || ""} // ✅ Fallback to empty string
+              name="username"
+              value={formData.username || ""} // ✅ Fallback to empty string
               onChange={handleChange}
               className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
               required
