@@ -17,7 +17,7 @@ export default function Login() {
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token && isTokenValid()) {
-      router.replace("/adminur/overview");
+      router.replace("/admin/dashboard");
     } else {
       localStorage.removeItem("token");
       localStorage.removeItem("userRole");
@@ -58,9 +58,9 @@ export default function Login() {
       setError("");
 
       if (role === "admin") {
-        router.replace("/adminur/overview");
+        router.replace("/admin/dashboard");
       } else {
-        router.replace("/adminur");
+        router.replace("/admin");
       }
 
     } catch (err) {

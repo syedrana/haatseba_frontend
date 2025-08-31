@@ -1,20 +1,20 @@
 'use client';
 
-import axios from 'axios';
 import clsx from 'clsx';
 import { AnimatePresence, motion } from 'framer-motion';
+import { jwtDecode } from "jwt-decode";
 import { ChevronDown, CreditCard, FileText, Home, LogOut, Menu, Moon, Sun, User, X } from 'lucide-react';
 import Image from "next/image";
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 export default function DashboardLayout({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarHover, setSidebarHover] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
   const [openMenus, setOpenMenus] = useState({});
-  const [user, setUser] = useState(null);
+  const [admin, setAdmin] = useState(null);
 
   const pathname = usePathname(); // Next.js hook for current route
   const router = useRouter();
@@ -66,25 +66,21 @@ export default function DashboardLayout({ children }) {
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
-      router.push("/login");
+      router.push("/admin");
       return;
     }
 
-    const fetchProfile = async () => {
-      try {
-        const res = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE}/getdashboardprofile`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setUser(res.data);
-      } catch (err) {
-        console.error(err);
-        if (err?.response?.status === 401 || err?.response?.status === 403) {
-          localStorage.removeItem("token");
-          router.push("/login");
-        }
+    try {
+      const decoded = jwtDecode(token);
+      console.log("decoded", decoded)
+      setAdmin(decoded);
+    } catch (err) {
+      console.error(err);
+      if (err?.response?.status === 401 || err?.response?.status === 403) {
+        localStorage.removeItem("token");
+        router.push("/login");
       }
-    };
-    fetchProfile();
+    }
   }, [router]);
 
    // ✅ Logout handler
@@ -100,6 +96,7 @@ export default function DashboardLayout({ children }) {
   const isActive = (href) => pathname === href;
 
   return (
+    
     <div className={clsx('flex h-screen', darkMode ? 'dark' : '')}>
 
       {/* Mobile Sidebar */}
@@ -129,11 +126,11 @@ export default function DashboardLayout({ children }) {
               </div>
 
               {/* ✅ User Profile */}
-              {user && (
+              {admin && (
                 <div className="flex flex-col items-center py-6 border-b border-gray-700">
-                  {user.image ? (
+                  {admin.image ? (
                     <Image
-                      src={user.image}
+                      src={admin.image}
                       alt="Profile"
                       width={64}
                       height={64}
@@ -144,10 +141,11 @@ export default function DashboardLayout({ children }) {
                     <User className="w-16 h-16 text-gray-400 mb-2" />
                   )}
                   <span className="font-semibold text-white">
-                    {user.firstName} {user.lastName}
+                    {admin.name}
                   </span>
-                  <span className="text-sm text-gray-400">{user.email}</span>
+                  <span className="text-sm text-gray-400">{admin.email}</span>
                 </div>
+              
               )}
 
               {/* Menu */}
@@ -250,7 +248,7 @@ export default function DashboardLayout({ children }) {
               </motion.span>
             )}
           </motion.div>
-          {user && (
+          {admin && (
             <div className="relative group w-full flex flex-col items-center">
               {/* Profile Image */}
               <motion.div
@@ -258,9 +256,9 @@ export default function DashboardLayout({ children }) {
                 transition={{ type: "spring", stiffness: 120 }}
                 className="mb-2 cursor-pointer"
               >
-                {user.image ? (
+                {admin.image ? (
                   <Image
-                    src={user.image}
+                    src={admin.image}
                     alt="Profile"
                     width={40}
                     height={40}
@@ -280,9 +278,9 @@ export default function DashboardLayout({ children }) {
                   className="text-center"
                 >
                   <span className="block text-white font-medium">
-                    {user.firstName} {user.lastName}
+                    {admin.name}
                   </span>
-                  <span className="block text-gray-300 text-sm">{user.email}</span>
+                  <span className="block text-gray-300 text-sm">{admin.email}</span>
                 </motion.div>
               ) : (
                 <motion.div
@@ -293,9 +291,9 @@ export default function DashboardLayout({ children }) {
                 >
                   <div className="flex flex-col">
                     <span className="font-medium">
-                      {user.firstName} {user.lastName}
+                      {admin.name}
                     </span>
-                    <span className="text-gray-300 text-sm">{user.email}</span>
+                    <span className="text-gray-300 text-sm">{admin.email}</span>
                   </div>
                 </motion.div>
               )}
@@ -442,7 +440,7 @@ export default function DashboardLayout({ children }) {
         </header>
 
         <main className="flex-1 overflow-y-auto p-4 md:p-6">
-          {children}
+          {children && React.cloneElement(children, { darkMode })}
         </main>
       </div>
     </div>
