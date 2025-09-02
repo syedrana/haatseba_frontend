@@ -29,7 +29,7 @@ export default function DashboardLayout({ children }) {
       name: 'User Management', 
       icon: CreditCard,
       children: [
-        { name: 'Pending Users', href: '/dashboard/deposit' },
+        { name: 'Pending Users', href: 'admin/dashboard/user' },
         { name: 'All Users', href: '/dashboard/withdraw' },
       ]
     },
@@ -72,7 +72,7 @@ export default function DashboardLayout({ children }) {
 
     try {
       const decoded = jwtDecode(token);
-      console.log("decoded", decoded)
+      
       setAdmin(decoded);
     } catch (err) {
       console.error(err);
@@ -86,7 +86,7 @@ export default function DashboardLayout({ children }) {
    // ✅ Logout handler
   const handleLogout = () => {
     localStorage.removeItem("token");
-    router.push("/login");
+    router.push("/admin");
   };
 
   const toggleMenu = (name) => {
