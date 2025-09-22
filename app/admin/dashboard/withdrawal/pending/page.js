@@ -1,8 +1,13 @@
 "use client";
 
+import axios from "axios";
 import { motion } from "framer-motion";
 import { CheckCircle, Loader2, Search, XCircle } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+
+// api connection
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:7000";
+const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
 
 export default function PendingWithdrawPage() {
   const [withdraws, setWithdraws] = useState([]);
@@ -12,29 +17,37 @@ export default function PendingWithdrawPage() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
-  const fetchWithdraws = async () => {
-    setLoading(true);
-    try {
-      const res = await fetch(`/api/admin/withdraws/pending?search=${search}&page=${page}&limit=10`);
-      const data = await res.json();
-      setWithdraws(data.withdraws || []);
-      setTotalPages(data.totalPages || 1);
-    } catch (err) {
-      console.error("Error loading withdraws:", err);
-    }
+  const fetchWithdraws = useCallback(async () => {
+  setLoading(true);
+  try {
+    const res = await axios.get(
+      `${API_BASE}/pendingwithdrawal?search=${search}&page=${page}&limit=2`,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    setWithdraws(res.data.withdraws || []);
+    setTotalPages(res.data.totalPages || 1);
+  } catch (err) {
+    console.error("Error loading withdraws:", err);
+  } finally {
     setLoading(false);
-  };
+  }
+}, [search, page]);
+
 
   useEffect(() => {
     fetchWithdraws();
-  }, [search, page]);
+  }, [fetchWithdraws]);
 
-  // highlight function
+  // ✅ Highlight function
   const highlight = (text) => {
     if (!search) return text;
     const regex = new RegExp(`(${search})`, "gi");
     return text.split(regex).map((part, i) =>
-      regex.test(part) ? <mark key={i} className="bg-yellow-300">{part}</mark> : part
+      part.toLowerCase() === search.toLowerCase() ? (
+        <mark key={i} className="bg-yellow-300">{part}</mark>
+      ) : (
+        part
+      )
     );
   };
 
@@ -42,22 +55,25 @@ export default function PendingWithdrawPage() {
   const handleAction = async (id, action) => {
     setActionLoading(id + action);
     try {
-      const res = await fetch(`/api/admin/withdraws/${id}/${action}`, {
-        method: "POST",
+      const endpoint =
+        action === "approve"
+          ? `${API_BASE}/approvewithdraw/${id}`
+          : `${API_BASE}/rejectwithdraw/${id}`;
+
+      const res = await axios.patch(endpoint, {}, {
+        headers: { Authorization: `Bearer ${token}` },
       });
-      const data = await res.json();
-      if (res.ok) {
-        alert(data.message || `${action} successful`);
-        fetchWithdraws(); // refresh
-      } else {
-        alert(data.message || "Something went wrong");
-      }
+
+      alert(res.data.message || `${action} successful`);
+      fetchWithdraws();
     } catch (error) {
       console.error(`${action} error:`, error);
-      alert("Server error");
+      alert(error.response?.data?.message || "Server error");
+    } finally {
+      setActionLoading(null);
     }
-    setActionLoading(null);
   };
+
 
   return (
     <div className="p-6">
