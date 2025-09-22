@@ -21,31 +21,70 @@ export default function DashboardLayout({ children }) {
 
   // Nested menu structure
    
+  // const menuItems = useMemo(
+  //   () => [
+  //   { name: 'Dashboard', href: '/dashboard', icon: Home },
+  //   { name: 'Downline Tree', href: '/dashboard/downline', icon: Home },
+  //   { 
+  //     name: 'User Management', 
+  //     icon: CreditCard,
+  //     children: [
+  //       { name: 'Pending Users', href: 'admin/dashboard/user' },
+  //       { name: 'All Users', href: '/dashboard/withdraw' },
+  //     ]
+  //   },
+  //   { 
+  //     name: 'Withdrawal', 
+  //     icon: CreditCard,
+  //     children: [
+  //       { name: 'All Withdraws', href: '/dashboard/deposit' },
+  //       { name: 'Pending Requests', href: '/dashboard/withdraw' },
+  //     ]
+  //   },
+  //   { name: 'Transactions', href: '/dashboard/transactions', icon: FileText },
+  //   { name: 'Profile', href: '/dashboard/profile', icon: User },
+  // ],
+  //   []
+  // );
+
+
+
+
   const menuItems = useMemo(
     () => [
-    { name: 'Dashboard', href: '/dashboard', icon: Home },
-    { name: 'Downline Tree', href: '/dashboard/downline', icon: Home },
-    { 
-      name: 'User Management', 
-      icon: CreditCard,
-      children: [
-        { name: 'Pending Users', href: 'admin/dashboard/user' },
-        { name: 'All Users', href: '/dashboard/withdraw' },
-      ]
-    },
-    { 
-      name: 'Withdrawal', 
-      icon: CreditCard,
-      children: [
-        { name: 'All Withdraws', href: '/dashboard/deposit' },
-        { name: 'Pending Requests', href: '/dashboard/withdraw' },
-      ]
-    },
-    { name: 'Transactions', href: '/dashboard/transactions', icon: FileText },
-    { name: 'Profile', href: '/dashboard/profile', icon: User },
-  ],
+      { name: 'Dashboard', href: '/admin/dashboard', icon: Home },
+      { name: 'Downline Tree', href: '/admin/dashboard/downline', icon: Home },
+      { 
+        name: 'User Management', 
+        icon: CreditCard,
+        children: [
+          { name: 'Pending Users', href: '/admin/dashboard/user' },
+          { name: 'All Users', href: '/admin/dashboard/users' },
+        ]
+      },
+      { 
+        name: 'Withdrawal', 
+        icon: CreditCard,
+        children: [
+          { name: 'All Withdraws', href: '/admin/dashboard/withdraws' },
+          { name: 'Pending Requests', href: '/admin/dashboard/withdrawal' },
+        ]
+      },
+      { name: 'Transactions', href: '/admin/dashboard/transaction', icon: FileText },
+      { name: 'Profile', href: '/admin/dashboard/profile', icon: User },
+    ],
     []
   );
+
+
+
+
+
+
+
+
+
+
 
   // Auto-expand parent if child is active
   useEffect(() => {
