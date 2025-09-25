@@ -22,40 +22,12 @@ function WithdrawTable({ type }) {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
-  // Debounce Search
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedSearch(search);
-      setPage(1);
-    }, 500);
-    return () => clearTimeout(handler);
-  }, [search]);
-
-  const fetchWithdraws = useCallback(async () => {
-    setLoading(true);
-    try {
-      const res = await axios.get(
-        `${API_BASE}/${type}withdrawal?search=${debouncedSearch}&page=${page}&limit=5`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      setWithdraws(res.data.withdraws || []);
-      setTotalPages(res.data.totalPages || 1);
-    } catch (err) {
-      console.error("Error loading withdraws:", err);
-    } finally {
-      setLoading(false);
-    }
-  }, [debouncedSearch, page, type]);
-
-  useEffect(() => {
-    fetchWithdraws();
-  }, [fetchWithdraws]);
-
-  // Highlight
+  // ✅ Safe highlight function
   const highlight = (text) => {
+    if (text === null || text === undefined) return "";
     if (!debouncedSearch) return text;
     const regex = new RegExp(`(${debouncedSearch})`, "gi");
-    return text.split(regex).map((part, i) =>
+    return text.toString().split(regex).map((part, i) =>
       part.toLowerCase() === debouncedSearch.toLowerCase() ? (
         <mark
           key={i}
@@ -69,14 +41,51 @@ function WithdrawTable({ type }) {
     );
   };
 
+  // Debounce Search
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(search);
+      setPage(1);
+    }, 500);
+    return () => clearTimeout(handler);
+  }, [search]);
+
+  const fetchWithdraws = useCallback(async () => {
+    setLoading(true);
+    try {
+      const endpoint =
+        type === "pending"
+          ? `${API_BASE}/pendingusers`
+          : type === "approved"
+          ? `${API_BASE}/approvedusers`
+          : `${API_BASE}/rejectedusers`;
+
+      const res = await axios.get(
+        `${endpoint}?search=${debouncedSearch}&page=${page}&limit=10`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      setWithdraws(res.data.users || []);
+      setTotalPages(res.data.totalPages || 1);
+    } catch (err) {
+      console.error("Error loading withdraws:", err);
+    } finally {
+      setLoading(false);
+    }
+  }, [debouncedSearch, page, type]);
+
+  useEffect(() => {
+    fetchWithdraws();
+  }, [fetchWithdraws]);
+
   // Approve / Reject
   const handleAction = async (id, action) => {
     setActionLoading(id + action);
     try {
       const endpoint =
         action === "approve"
-          ? `${API_BASE}/approvewithdraw/${id}`
-          : `${API_BASE}/rejectwithdraw/${id}`;
+          ? `${API_BASE}/approveuser/${id}`
+          : `${API_BASE}/rejectuser/${id}`;
 
       const res = await axios.patch(
         endpoint,
@@ -126,10 +135,10 @@ function WithdrawTable({ type }) {
           <thead className="bg-gray-100 dark:bg-gray-800 text-left">
             <tr>
               <th className="px-4 py-2">User</th>
-              <th className="px-4 py-2">Amount</th>
-              <th className="px-4 py-2">Method</th>
-              <th className="px-4 py-2">Account</th>
+              <th className="px-4 py-2">Address</th>
               <th className="px-4 py-2">Requested At</th>
+              <th className="px-4 py-2">Referral</th>
+              <th className="px-4 py-2">Position</th>
               <th className="px-4 py-2 text-center">Actions</th>
             </tr>
           </thead>
@@ -149,42 +158,66 @@ function WithdrawTable({ type }) {
                   className={`border-t dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 ${rowBgClass(type)}`}
                 >
                   <td className="px-4 py-2 flex items-center gap-2">
-                    {/* <div className="w-8 h-8 relative rounded-full overflow-hidden">
+                    {/* Avatar */}
+                    <div className="w-8 h-8 relative rounded-full overflow-hidden shadow-md dark:shadow-gray-700 transform transition-transform duration-300 hover:scale-110">
                       <Image
-                        src={w.userId.image || "/default-avatar.png"}
-                        alt={w.userId.firstName}
-                        fill
-                        className="object-cover"
-                      />
-                    </div> */}
-                    {/* Avatar with hover effect */}
-                    <div className="w-8 h-8 relative rounded-full overflow-hidden shadow-md dark:shadow-gray-700 
-                                    transform transition-transform duration-300 hover:scale-110">
-                      <Image
-                        src={w.userId.image || "/default-avatar.png"}
-                        alt={w.userId.firstName}
+                        src={w?.image || "/default-avatar.png"}
+                        alt={w?.firstName || "User"}
                         fill
                         className="object-cover"
                       />
                     </div>
-
                     <div>
                       <div className="font-semibold">
-                        {highlight(w.userId.firstName + " " + w.userId.lastName)}
+                        {highlight(`${w?.firstName || ""} ${w?.lastName || ""}`)}
                       </div>
                       <div className="text-gray-500 dark:text-gray-400">
-                        {highlight(w.userId.email)}
+                        {highlight(w?.email)}
                       </div>
                       <div className="text-gray-400 text-xs">
-                        {highlight(w.userId.phone)}
+                        {highlight(w?.phone)}
+                      </div>
+                      <div className="text-gray-500 dark:text-gray-400 text-xs">
+                        {highlight(
+                          w?.isEmailVerified
+                            ? "✅ Email verification completed."
+                            : "⚠️ Email verification not completed."
+                        )}
                       </div>
                     </div>
                   </td>
-                  <td className="px-4 py-2 font-bold text-red-500">৳ {w.amount}</td>
-                  <td className="px-4 py-2">{highlight(w.method)}</td>
-                  <td className="px-4 py-2">{highlight(w.accountNumber)}</td>
+                  <td className="px-4 py-2">{highlight(w?.address)}</td>
                   <td className="px-4 py-2 text-gray-500 dark:text-gray-400">
-                    {new Date(w.createdAt).toLocaleString()}
+                    {new Intl.DateTimeFormat("en-US", {
+                      dateStyle: "medium",
+                      timeStyle: "short",
+                    }).format(new Date(w?.createdAt))}
+                  </td>
+                  <td className="px-4 py-2 flex items-center gap-2">
+                    <div className="w-8 h-8 relative rounded-full overflow-hidden shadow-md dark:shadow-gray-700 transform transition-transform duration-300 hover:scale-110">
+                      <Image
+                        src={w?.parentId?.image || "/default-avatar.png"}
+                        alt={w?.parentId?.firstName || "Parent"}
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                    <div>
+                      <div className="font-semibold">
+                        {highlight(
+                          `${w?.parentId?.firstName || ""} ${w?.parentId?.lastName || ""}`
+                        )}
+                      </div>
+                      <div className="text-gray-500 dark:text-gray-400">
+                        {highlight(w?.parentId?.email || "")}
+                      </div>
+                      <div className="text-gray-400 text-xs">
+                        {highlight(w?.parentId?.phone || "")}
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-4 py-2">
+                    {highlight(w?.parentId?.placementPosition || "")}
                   </td>
                   <td className="px-4 py-2 text-center flex gap-2 justify-center">
                     {type === "pending" && (
@@ -224,7 +257,7 @@ function WithdrawTable({ type }) {
                   colSpan="6"
                   className="text-center py-6 text-gray-500 dark:text-gray-400"
                 >
-                  No {type} withdrawals found
+                  No {type} users found
                 </td>
               </tr>
             )}
@@ -247,36 +280,56 @@ function WithdrawTable({ type }) {
               className={`rounded-xl border p-4 bg-white dark:bg-gray-900 dark:border-gray-700 shadow ${rowBgClass(type)}`}
             >
               <div className="flex items-center gap-2 mb-2">
-                {/* <div className="w-10 h-10 relative rounded-full overflow-hidden">
-                  <Image
-                    src={w.userId.image || "/default-avatar.png"}
-                    alt={w.userId.firstName}
-                    fill
-                    className="object-cover"
-                  />
-                </div> */}
                 <div className="w-10 h-10 relative rounded-full overflow-hidden shadow-md dark:shadow-gray-700 transform transition-transform duration-300 hover:scale-110">
                   <Image
-                    src={w.userId.image || "/default-avatar.png"}
-                    alt={w.userId.firstName}
+                    src={w.image || "/default-avatar.png"}
+                    alt={w.firstName || "User"}
                     fill
                     className="object-cover"
                   />
                 </div>
 
                 <div>
-                  <div className="font-semibold">{highlight(w.userId.firstName + " " + w.userId.lastName)}</div>
-                  <div className="text-gray-500 dark:text-gray-400">{highlight(w.userId.email)}</div>
-                  <div className="text-gray-400 text-xs">{highlight(w.userId.phone)}</div>
+                  <div className="font-semibold">{highlight(`${w.firstName || ""} ${w.lastName || ""}`)}</div>
+                  <div className="text-gray-500 dark:text-gray-400">{highlight(w.email || "")}</div>
+                  <div className="text-gray-400 text-xs">{highlight(w.phone || "")}</div>
+                  <div className="text-gray-500 text-xs dark:text-gray-400">{highlight(w.address || "")}</div>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-10 h-10 relative rounded-full overflow-hidden shadow-md dark:shadow-gray-700 transform transition-transform duration-300 hover:scale-110">
+                  <Image
+                    src={w.parentId?.image || "/default-avatar.png"}
+                    alt={w.parentId?.firstName || "Parent"}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+
+                <div>
+                  <div className="font-semibold">{highlight(`${w.parentId?.firstName || ""} ${w.parentId?.lastName || ""}`)}</div>
+                  <div className="text-gray-500 dark:text-gray-400">{highlight(w.parentId?.email || "")}</div>
+                  <div className="text-gray-400 text-xs">{highlight(w.parentId?.phone || "")}</div>
                 </div>
               </div>
 
               <div className="flex justify-between text-sm mb-2">
-                <span className="font-bold text-red-500">৳ {w.amount}</span>
-                <span>{highlight(w.method)}</span>
+                <span>Position :</span> <span className="font-bold text-red-500">{highlight(w.parentId?.placementPosition || "")}</span>
               </div>
-              <div className="text-gray-500 text-xs mb-1">Acc: {highlight(w.accountNumber)}</div>
-              <div className="text-gray-400 text-xs mb-3">{new Date(w.createdAt).toLocaleString()}</div>
+              <div className="text-gray-500 text-xs mb-1">
+                {highlight(
+                  w.isEmailVerified
+                    ? "✅ Email verification completed."
+                    : "⚠️ Email verification not completed."
+                )}
+              </div>
+              <div className="text-gray-400 text-xs mb-3">
+                {new Intl.DateTimeFormat("en-US", {
+                  dateStyle: "medium",
+                  timeStyle: "short",
+                }).format(new Date(w.createdAt))}
+              </div>
 
               {type === "pending" && (
                 <div className="flex gap-2">
@@ -310,7 +363,7 @@ function WithdrawTable({ type }) {
           ))
         ) : (
           <div className="text-center py-6 text-gray-500 dark:text-gray-400">
-            No {type} withdrawals found
+            No {type} users found
           </div>
         )}
       </div>
@@ -320,8 +373,7 @@ function WithdrawTable({ type }) {
         <button
           onClick={() => setPage((p) => Math.max(1, p - 1))}
           disabled={page === 1}
-          className="px-4 py-2 rounded-lg border dark:border-gray-700 disabled:opacity-50 
-                     bg-white dark:bg-gray-800"
+          className="px-4 py-2 rounded-lg border dark:border-gray-700 disabled:opacity-50 bg-white dark:bg-gray-800"
         >
           Prev
         </button>
@@ -331,8 +383,7 @@ function WithdrawTable({ type }) {
         <button
           onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
           disabled={page === totalPages}
-          className="px-4 py-2 rounded-lg border dark:border-gray-700 disabled:opacity-50 
-                     bg-white dark:bg-gray-800"
+          className="px-4 py-2 rounded-lg border dark:border-gray-700 disabled:opacity-50 bg-white dark:bg-gray-800"
         >
           Next
         </button>
@@ -347,9 +398,9 @@ export default function WithdrawPage() {
       <h1 className="text-2xl font-bold mb-6">💳 Withdrawals</h1>
       <Tabs defaultValue="pending" className="w-full">
         <TabsList className="grid grid-cols-3 max-w-md mb-6 bg-gray-100 dark:bg-gray-800 rounded-xl">
-          <TabsTrigger value="pending">🟡 Pending</TabsTrigger>
-          <TabsTrigger value="approved">🟢 Approved</TabsTrigger>
-          <TabsTrigger value="rejected">🔴 Rejected</TabsTrigger>
+          <TabsTrigger value="pending">Pending</TabsTrigger>
+          <TabsTrigger value="approved">Approved</TabsTrigger>
+          <TabsTrigger value="rejected">Rejected</TabsTrigger>
         </TabsList>
 
         <TabsContent value="pending">
