@@ -200,11 +200,20 @@ export default function RegisterForm() {
         }
       });
       // nominee object
-      formData.append("nominee[firstName]", form.nomineeFirstName.trim());
-      formData.append("nominee[lastName]", form.nomineeLastName.trim());
-      formData.append("nominee[relation]", form.nomineeRelation.trim());
-      formData.append("nominee[phone]", form.nomineePhone.trim());
-      formData.append("nominee[address]", form.nomineeAddress.trim());
+      // formData.append("nominee[firstName]", form.nomineeFirstName.trim());
+      // formData.append("nominee[lastName]", form.nomineeLastName.trim());
+      // formData.append("nominee[relation]", form.nomineeRelation.trim());
+      // formData.append("nominee[phone]", form.nomineePhone.trim());
+      // formData.append("nominee[address]", form.nomineeAddress.trim());
+
+      formData.append("nominee", JSON.stringify({
+        firstName: form.nomineeFirstName.trim(),
+        lastName: form.nomineeLastName.trim(),
+        relation: form.nomineeRelation.trim(),
+        phone: form.nomineePhone.trim(),
+        address: form.nomineeAddress.trim(),
+      }));
+
 
       if (imgFile) formData.append("image", imgFile);
 
@@ -468,13 +477,14 @@ export default function RegisterForm() {
             value={form.nomineeRelation}
             onChange={onChange}
             options={[
-              { value: "father", label: "Father" },
-              { value: "mother", label: "Mother" },
-              { value: "brother", label: "Brother" },
-              { value: "sister", label: "Sister" },
-              { value: "spouse", label: "Spouse" },
-              { value: "child", label: "Child" },
-              { value: "other", label: "Other" },
+              { value: "Father", label: "Father" },
+              { value: "Mother", label: "Mother" },
+              { value: "Brother", label: "Brother" },
+              { value: "Sister", label: "Sister" },
+              { value: "Spouse", label: "Spouse" },
+              { value: "Child", label: "Child" },
+              { value: "Relative", label: "Relative" },
+              { value: "Other", label: "Other" },
             ]}
             error={errors.nomineeRelation}
           />
