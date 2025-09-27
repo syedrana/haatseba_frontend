@@ -266,7 +266,7 @@ export default function RegisterForm() {
 
   // ---------- UI ----------
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-50 pt-20 pb-10 px-4">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-950 flex items-center justify-center p-6 pt-20">
       <form
         onSubmit={onSubmit}
         className="w-full max-w-2xl bg-white shadow-lg rounded-2xl p-8 space-y-6"
@@ -522,3 +522,8 @@ export default function RegisterForm() {
     </div>
   );
 }
+
+
+
+
+

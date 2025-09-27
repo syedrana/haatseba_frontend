@@ -1,57 +1,101 @@
-"use client"; 
+"use client";
 
-import Image from 'next/image'; // Correctly import the Next.js Image component
-import Link from 'next/link';
+import { Facebook, Linkedin, Mail, MapPin, Phone, Twitter, Youtube } from "lucide-react";
+import Link from "next/link";
 
 const Footer = () => {
   return (
-    <footer className="bg-cyan-50 py-10 text-black">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+    <footer className="bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 text-gray-300 py-12 relative overflow-hidden">
+      {/* Glow Background Accent */}
+      <div className="absolute inset-0 bg-gradient-to-r from-orange-500/10 via-cyan-500/10 to-orange-500/10 blur-3xl"></div>
+
+      <div className="relative max-w-7xl mx-auto px-6 lg:px-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
           
-          {/* Logo and Description */}
+          {/* HaatSheba Section */}
           <div>
-            <Image src="/trust1x.png" alt="Trust1x Logo" width={100} height={100} />
-            <p className="mt-4 text-xs sm:text-sm">
-              Feel free to contact us for any inquiries or assistance. Our dedicated team is here to support you on your learning journey.
-            </p>
-            <p className="mt-4 text-xs sm:text-sm">Trade-License : TRAD/DNCC/043784/2023</p>
-          </div>
-          
-          {/* Contact Information */}
-          <div>
-            <h3 className="text-sm sm:text-lg font-bold mb-4">Find Us</h3>
-            <p className="text-xs sm:text-sm">
-              Address: 190/A/1A East Rampura, Dhaka 1219
-            </p>
-            <p className="text-xs sm:text-sm mt-2">
-              Email: <a href="mailto:info@trust1xdps.com" className="text-blue-400">info@trust1xdps.com</a>
-            </p>
-            <p className="text-xs sm:text-sm mt-2">
-              Phone: +8801986878899
+            <Link href="/">
+              <h1 className="text-3xl font-extrabold text-orange-600">
+                HaatSeba
+              </h1>
+            </Link>
+            <p className="mt-4 text-sm text-gray-400 leading-relaxed">
+              Your trusted online livestock marketplace. 
+              Find cows, goats, camels and safe transportation services all in one place.
             </p>
           </div>
-          
-          {/* Social Media and Links */}
+
+          {/* Contact */}
           <div>
-            <h3 className="text-sm sm:text-lg font-bold mb-4">Follow Us</h3>
-            <div className="flex space-x-4">
-              <Link href="https://facebook.com">
-                <span className="text-blue-400 hover:text-white">Facebook</span>
+            <h3 className="text-lg font-semibold text-white mb-4">Contact Us</h3>
+            <p className="flex items-center text-sm mb-3">
+              <MapPin className="w-4 h-4 text-orange-500 mr-2" />
+              190/A/1A East Rampura, Dhaka 1219
+            </p>
+            <p className="flex items-center text-sm mb-3">
+              <Mail className="w-4 h-4 text-orange-500 mr-2" />
+              <a
+                href="mailto:haatseba@gmail.com"
+                className="hover:text-cyan-400 transition"
+              >
+                haatseba@gmail.com
+              </a>
+            </p>
+            <p className="flex items-center text-sm">
+              <Phone className="w-4 h-4 text-orange-500 mr-2" />
+              +8801986878899
+            </p>
+          </div>
+
+          {/* Social Links */}
+          <div>
+            <h3 className="text-lg font-semibold text-white mb-4">Follow Us</h3>
+            <div className="flex space-x-5">
+              <Link
+                href="https://facebook.com"
+                className="w-12 h-12 flex items-center justify-center rounded-full bg-gradient-to-br from-cyan-400 to-cyan-600 text-white shadow-lg shadow-cyan-400/60 hover:shadow-cyan-400/90 hover:scale-110 transition transform"
+              >
+                <Facebook className="w-6 h-6" />
+              </Link>
+              <Link
+                href="https://twitter.com"
+                className="w-12 h-12 flex items-center justify-center rounded-full bg-gradient-to-br from-sky-400 to-cyan-500 text-white shadow-lg shadow-cyan-400/60 hover:shadow-cyan-400/90 hover:scale-110 transition transform"
+              >
+                <Twitter className="w-6 h-6" />
+              </Link>
+              <Link
+                href="https://linkedin.com"
+                className="w-12 h-12 flex items-center justify-center rounded-full bg-gradient-to-br from-orange-400 to-orange-600 text-white shadow-lg shadow-orange-500/60 hover:shadow-orange-500/90 hover:scale-110 transition transform"
+              >
+                <Linkedin className="w-6 h-6" />
+              </Link>
+              <Link
+                href="https://youtube.com"
+                className="w-12 h-12 flex items-center justify-center rounded-full bg-gradient-to-br from-red-500 to-red-700 text-white shadow-lg shadow-red-500/60 hover:shadow-red-500/90 hover:scale-110 transition transform"
+              >
+                <Youtube className="w-6 h-6" />
               </Link>
             </div>
           </div>
-
         </div>
 
-        <div className="mt-8 border-t border-gray-700 pt-4 text-center text-xs sm:text-sm">
-          © 2024 AI Point. All rights reserved.
-          <div className="mt-4">
-            <Link href="">
+        {/* Bottom Bar */}
+        <div className="mt-10 border-t border-gray-700 pt-6 text-center">
+          <p className="text-xs sm:text-sm text-gray-400">
+            © 2025 HaatSeba. All rights reserved.
+          </p>
+          <div className="mt-3 flex justify-center space-x-4 text-sm">
+            <Link
+              href="#"
+              className="hover:text-orange-400 hover:underline transition"
+            >
               Privacy Policy
             </Link>
-            <span className="mx-2">|</span>
-            <Link href="">
+            <span className="text-gray-500">|</span>
+            <Link
+              href="#"
+              className="hover:text-cyan-400 hover:underline transition"
+            >
               Terms of Service
             </Link>
           </div>
