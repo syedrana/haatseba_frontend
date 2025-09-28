@@ -116,7 +116,7 @@ const Home = () => {
               className="p-6 rounded-xl bg-slate-800 text-center shadow-lg shadow-cyan-400/20 hover:shadow-cyan-400/80 transform transition animate-fade-in"
               style={{ animationDelay: `${0.2 + idx * 0.2}s` }}
             >
-              <p className="text-gray-300 italic">"{t}"</p>
+              <p className="text-gray-300 italic">&quot;{t}&quot;</p>
             </div>
           ))}
         </div>
