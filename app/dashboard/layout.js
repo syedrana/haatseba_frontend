@@ -3,7 +3,7 @@
 import axios from 'axios';
 import clsx from 'clsx';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ChevronDown, CreditCard, FileText, Home, LogOut, Menu, Moon, Sun, User, X } from 'lucide-react';
+import { ChevronDown, Home, LogOut, Menu, Moon, Sun, User, X } from 'lucide-react';
 import Image from "next/image";
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -25,15 +25,15 @@ export default function DashboardLayout({ children }) {
     () => [
     { name: 'Dashboard', href: '/dashboard', icon: Home },
     { name: 'Downline Tree', href: '/dashboard/downline', icon: Home },
-    { 
-      name: 'Finance', 
-      icon: CreditCard,
-      children: [
-        { name: 'Deposit', href: '/dashboard/deposit' },
-        { name: 'Withdraw', href: '/dashboard/withdraw' },
-      ]
-    },
-    { name: 'Transactions', href: '/dashboard/transactions', icon: FileText },
+    // { 
+    //   name: 'Finance', 
+    //   icon: CreditCard,
+    //   children: [
+    //     { name: 'Deposit', href: '/dashboard/deposit' },
+    //     { name: 'Withdraw', href: '/dashboard/withdraw' },
+    //   ]
+    // },
+    // { name: 'Transactions', href: '/dashboard/transactions', icon: FileText },
     { name: 'Profile', href: '/dashboard/profile', icon: User },
   ],
     []

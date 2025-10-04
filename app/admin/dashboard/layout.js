@@ -3,7 +3,7 @@
 import clsx from 'clsx';
 import { AnimatePresence, motion } from 'framer-motion';
 import { jwtDecode } from "jwt-decode";
-import { ChevronDown, CreditCard, FileText, Home, LogOut, Menu, Moon, Sun, User, X } from 'lucide-react';
+import { Banknote, ChevronDown, LayoutDashboard, LogOut, Menu, Moon, Network, ReceiptText, Sun, User, UserCog, X } from 'lucide-react';
 import Image from "next/image";
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -51,32 +51,26 @@ export default function DashboardLayout({ children }) {
 
 
   const menuItems = useMemo(
-    () => [
-      { name: 'Dashboard', href: '/admin/dashboard', icon: Home },
-      { name: 'Downline Tree', href: '/admin/dashboard/downline', icon: Home },
-      { 
-        name: 'User Management', 
-        icon: CreditCard,
-        children: [
-          { name: 'Pending Users', href: '/admin/dashboard/user' },
-          { name: 'All Users', href: '/admin/dashboard/users' },
-        ]
-      },
-      { 
-        name: 'Withdrawal', 
-        icon: CreditCard,
-        children: [
-          { name: 'All Withdraws', href: '/admin/dashboard/withdraws' },
-          { name: 'Pending Requests', href: '/admin/dashboard/withdrawal' },
-        ]
-      },
-      { name: 'Transactions', href: '/admin/dashboard/transaction', icon: FileText },
-      { name: 'Profile', href: '/admin/dashboard/profile', icon: User },
-    ],
-    []
-  );
+  () => [
+    { name: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
+    { name: "Downline Tree", href: "/admin/dashboard/downline", icon: Network },
+    { name: "User Management", href: "/admin/dashboard/user/pending", icon: UserCog },
+    { name: "Withdrawal Management", href: "/admin/dashboard/withdrawal/pending", icon: Banknote },
+    { name: "Transactions", href: "/admin/dashboard/transaction", icon: ReceiptText },
+  ],
+  []
+);
 
-
+// const menuItems = useMemo(
+//   () => [
+//     { name: "Dashboard", href: "/admin/dashboard", icon: Home },
+//     { name: "Downline Tree", href: "/admin/dashboard/downline", icon: TreePine },
+//     { name: "User Management", href: "/admin/dashboard/user/pending", icon: Users },
+//     { name: "Withdrawal Management", href: "/admin/dashboard/withdrawal/pending", icon: Wallet },
+//     { name: "Transactions", href: "/admin/dashboard/transaction", icon: FileText },
+//   ],
+//   []
+// );
 
 
 
