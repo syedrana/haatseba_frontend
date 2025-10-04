@@ -2,7 +2,8 @@
 
 import axios from "axios";
 import Image from "next/image";
-import { useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 
 // ---------- Helpers ----------
 const bdPhoneOk = (v) => /^01[3-9]\d{8}$/.test(v || "");
@@ -26,6 +27,7 @@ const FloatingInput = ({
   toggleType,
   error,
   autoComplete,
+  readOnly = false,
 }) => (
   <div className="relative w-full">
     <input
@@ -37,7 +39,8 @@ const FloatingInput = ({
       placeholder=" "
       autoComplete={autoComplete}
       className={`peer block w-full rounded-xl border px-3 pt-5 pb-2 text-sm bg-transparent h-14 focus:outline-none focus:ring-2
-      ${error ? "border-red-500 focus:ring-red-200" : "border-gray-300 focus:border-indigo-500 focus:ring-indigo-200"}`}
+      ${error ? "border-red-500 focus:ring-red-200" : "border-gray-300 focus:border-indigo-500 focus:ring-indigo-200"}
+      ${readOnly ? "bg-gray-100 cursor-not-allowed" : ""}`}
     />
     <label
       htmlFor={name}
@@ -85,6 +88,10 @@ const FloatingSelect = ({ label, name, value, onChange, options, error }) => (
 
 // ---------- Registration Page ----------
 export default function RegisterForm() {
+
+  const searchParams = useSearchParams(); 
+  const refCode = searchParams.get("ref");
+
   const [form, setForm] = useState({
     firstName: "",
     lastName: "",
@@ -109,6 +116,12 @@ export default function RegisterForm() {
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
   const dropRef = useRef(null);
+
+  useEffect(() => {
+    if (refCode) {
+      setForm((prev) => ({ ...prev, referralCode: refCode }));
+    }
+  }, [refCode]);
 
   const onChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
@@ -394,6 +407,7 @@ export default function RegisterForm() {
           value={form.referralCode}
           onChange={onChange}
           error={errors.referralCode}
+          readOnly={!!refCode}
         />
 
         {/* Placement Position */}
