@@ -238,6 +238,7 @@ export default function RegisterForm() {
             Authorization: process.env.NEXT_PUBLIC_API_KEY,
             "Content-Type": "multipart/form-data",
           },
+          timeout: 30000,
         }
       );
 
