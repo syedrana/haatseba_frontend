@@ -241,6 +241,8 @@ export default function RegisterForm() {
         }
       );
 
+      localStorage.setItem("pendingEmail", form.email);
+
       alert(res.data.message);
 
       // Reset form

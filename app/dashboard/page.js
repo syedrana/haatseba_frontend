@@ -252,6 +252,37 @@ useEffect(() => {
                 </div>
               </div>
             </motion.div>
+
+            {/* Referral Link Section */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: 0.2 }}
+              className="rounded-2xl bg-white/60 dark:bg-gray-800/60 backdrop-blur p-5 shadow-sm border border-gray-100 dark:border-gray-700 mt-6"
+            >
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-base font-semibold text-gray-900 dark:text-white">My Referral Link</h3>
+              </div>
+
+              <div className="flex flex-col md:flex-row items-start md:items-center gap-3">
+                <div className="flex-1 break-all text-sm text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2 bg-white/80 dark:bg-gray-900/40">
+                  {`${process.env.NEXT_PUBLIC_FRONTEND_URL || "http://localhost:3000"}/register?ref=${data?.referralCode || "XXXXXX"}`}
+                </div>
+                <button
+                  onClick={() => {
+                    const link = `${process.env.NEXT_PUBLIC_FRONTEND_URL || "http://localhost:3000"}/register?ref=${data?.referralCode || ""}`;
+                    navigator.clipboard.writeText(link);
+                    alert("Referral link copied ✅");
+                  }}
+                  className="px-4 py-2 bg-gray-900 text-white dark:bg-white dark:text-gray-900 rounded-xl shadow-sm hover:opacity-90 transition text-sm"
+                >
+                  Copy
+                </button>
+              </div>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                Share this link with your friends — they’ll join under your network.
+              </p>
+            </motion.div>
           </>
         )}
       </div>
