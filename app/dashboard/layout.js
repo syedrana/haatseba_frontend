@@ -25,6 +25,7 @@ export default function DashboardLayout({ children }) {
     () => [
     { name: 'Dashboard', href: '/dashboard', icon: Home },
     { name: 'Downline Tree', href: '/dashboard/downline', icon: Home },
+    { name: 'Become A Vendor', href: '/dashboard/vendor/request', icon: Home },
     // { 
     //   name: 'Finance', 
     //   icon: CreditCard,
@@ -33,7 +34,7 @@ export default function DashboardLayout({ children }) {
     //     { name: 'Withdraw', href: '/dashboard/withdraw' },
     //   ]
     // },
-    // { name: 'Transactions', href: '/dashboard/transactions', icon: FileText },
+    //{ name: 'Become A Vendor', href: '/dashboard/vendor/request', icon: FileText },
     { name: 'Profile', href: '/dashboard/profile', icon: User },
   ],
     []

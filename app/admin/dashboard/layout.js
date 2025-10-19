@@ -57,6 +57,7 @@ export default function DashboardLayout({ children }) {
     { name: "User Management", href: "/admin/dashboard/user/pending", icon: UserCog },
     { name: "Withdrawal Management", href: "/admin/dashboard/withdrawal/pending", icon: Banknote },
     { name: "Transactions", href: "/admin/dashboard/transaction", icon: ReceiptText },
+    { name: "Vendor Management", href: "/admin/dashboard/vendor-requests", icon: ReceiptText },
   ],
   []
 );
