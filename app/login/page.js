@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { isTokenValid } from "../utils/auth";
 
 export default function Login() {
-  const [formData, setFormData] = useState({ email: "", password: "" });
+  const [formData, setFormData] = useState({ identifier: "", password: "" });
   const [error, setError] = useState("");
   const [scrollY, setScrollY] = useState(0);
   const router = useRouter();
@@ -54,7 +54,7 @@ export default function Login() {
       localStorage.setItem("token", token);
       localStorage.setItem("userRole", role);
 
-      setFormData({ email: "", password: "" });
+      setFormData({ identifier: "", password: "" });
       setError("");
 
       if (role === "user") {
@@ -89,14 +89,14 @@ export default function Login() {
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label className="block text-gray-300 font-semibold mb-2">Email</label>
+            <label className="block text-gray-300 font-semibold mb-2">Email or Referral Code</label>
             <input
-              type="email"
-              name="email"
-              value={formData.email}
+              type="text"
+              name="identifier"
+              value={formData.identifier}
               onChange={handleChange}
               className="w-full px-4 py-2 rounded-lg border border-cyan-500 bg-slate-800 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:shadow-neon transition"
-              placeholder="your@email.com"
+              placeholder="Enter Email or Referral Code"
               required
             />
           </div>

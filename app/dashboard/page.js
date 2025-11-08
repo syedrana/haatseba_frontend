@@ -1,16 +1,3 @@
-// 'use client';
-
-// export default function DashboardHome() {
-//   return (
-//     <div>
-//       <h2 className="text-2xl font-bold mb-4">Welcome to Dashboard 🎉</h2>
-//       <p className="text-gray-700">Here you can see your summary.</p>
-//     </div>
-//   );
-// }
-
-
-
 "use client";
 
 import axios from "axios";
@@ -109,7 +96,34 @@ export default function DashboardPage() {
     downlineCount: 0,
     currentLevel: 0,
     totalBonus: 0,
+    bonusHistory: [],
   });
+
+  const [bonusAmounts, setBonusAmounts] = useState([]);
+  useEffect(() => {
+    const fetchBonuses = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const res = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE}/getallbonusplans`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+        // axios এ res.ok নাই, সরাসরি status চেক করতে হবে
+        if (res.status !== 200) {
+          throw new Error(res.data?.message || `Failed to load (${res.status})`);
+        }
+        // Convert array → object যেমন {1: 50, 2: 80, ...}
+        const bonusObj = res.data;
+        setBonusAmounts(bonusObj);
+      } catch (err) {
+        console.error("Failed to load bonus data:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchBonuses();
+  }, []);
 
   async function fetchDashboard() {
   setLoading(true);
@@ -252,8 +266,11 @@ useEffect(() => {
                 </div>
               </div>
             </motion.div>
+          </>
+        )}
+      </div>
 
-            {/* Referral Link Section */}
+{/* Referral Link Section */}
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -283,9 +300,213 @@ useEffect(() => {
                 Share this link with your friends — they’ll join under your network.
               </p>
             </motion.div>
-          </>
-        )}
+
+
+      {/* ✅ BONUS PLAN SECTION */}
+<section className="mt-10">
+  <h3 className="text-base md:text-lg font-semibold text-gray-900 dark:text-white mb-2">
+    Bonus Plan
+  </h3>
+  <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
+    According to the bonus structure below, you can see how much bonus you will receive at each level and whether you have achieved it or not.
+  </p>
+
+  <div className="rounded-2xl border border-gray-100 dark:border-gray-700 bg-white/60 dark:bg-gray-800/60 backdrop-blur shadow-sm">
+    {/* Table Header (Desktop) */}
+    <div className="hidden md:grid grid-cols-4 gap-4 p-4 text-sm font-medium text-gray-500 dark:text-gray-400 border-b border-gray-100 dark:border-gray-700">
+      <div>Level</div>
+      <div>Bonus Reward</div>
+      <div>Condition</div>
+      <div>Status</div>
+    </div>
+
+    {/* Table Body */}
+    <div className="divide-y divide-gray-100 dark:divide-gray-700">
+      {bonusAmounts.map((plan) => {
+         const { level, bonusAmount, rewardType, condition } = plan;
+        const achieved = data?.bonusHistory?.some(b => b.level == level);
+
+        const isNumber = !isNaN(Number(bonusAmount));
+        const bonusText =
+          rewardType === "cash"
+            ? (isNumber ? `BDT ${Number(bonusAmount).toLocaleString()}` : `BDT ${bonusAmount}`)
+            : rewardType === "product"
+            ? `🎁 ${bonusAmount}`
+            : `${bonusAmount}`;
+
+          return (
+            <div
+              key={level}
+              className="md:grid md:grid-cols-4 gap-4 p-4 text-sm flex flex-col"
+            >
+              {/* Desktop View */}
+              <div className="hidden md:block font-medium text-gray-800 dark:text-gray-100">
+                Level {level}
+              </div>
+              <div className="hidden md:block text-gray-700 dark:text-gray-200">
+                {bonusText}
+              </div>
+              <div className="hidden md:block text-gray-500 dark:text-gray-400">
+                {condition}
+              </div>
+              <div className="hidden md:block">
+                {achieved ? (
+                  <span className="bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400 px-2 py-1 rounded-full text-xs">
+                    ✅ Achieved
+                  </span>
+                ) : (
+                  <span className="bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-400 px-2 py-1 rounded-full text-xs">
+                    ❌ Not Achieved
+                  </span>
+                )}
+              </div>
+
+              {/* Mobile Card View */}
+              <div className="flex flex-col md:hidden bg-white/80 dark:bg-gray-900/40 rounded-xl border border-gray-100 dark:border-gray-700 p-3 mb-3 shadow-sm">
+                <div className="flex justify-between text-sm font-semibold text-gray-800 dark:text-gray-100">
+                  <span>Level {level}</span>
+                  <span>{bonusText}</span>
+                </div>
+                <div className="flex justify-between mt-2 text-xs text-gray-500 dark:text-gray-400">
+                  <span>{condition}</span>
+                  {achieved ? (
+                    <span className="text-emerald-500">✅ Achieved</span>
+                  ) : (
+                    <span className="text-red-500">❌ Not Achieved</span>
+                  )}
+                </div>
+              </div>
+            </div>
+          );
+        })}
+    </div>
+  </div>
+</section>
+
+
+
+
+
+
+
+
+      {/* ✅ BONUS HISTORY SECTION (Responsive + Premium) */}
+<section className="mt-10 mb-10">
+  <div className="flex items-center justify-between mb-2">
+    <h3 className="text-base md:text-lg font-semibold text-gray-900 dark:text-white">
+      Bonus History
+    </h3>
+    <div className="text-xs text-gray-500 dark:text-gray-400">
+      Showing up to 10 recent bonuses
+    </div>
+  </div>
+
+  {loading ? (
+    <TableSkeleton />
+  ) : (
+    <div className="rounded-2xl border border-gray-100 dark:border-gray-700 bg-white/60 dark:bg-gray-800/60 backdrop-blur shadow-sm">
+      {/* Desktop Table Header */}
+      <div className="hidden md:grid grid-cols-5 gap-4 p-4 text-sm font-medium text-gray-500 dark:text-gray-400 border-b border-gray-100 dark:border-gray-700">
+        <div>Level</div>
+        <div>Bonus</div>
+        <div>Type</div>
+        <div>Status</div>
+        <div>Date</div>
       </div>
+
+      {/* Table Body */}
+      <div className="divide-y divide-gray-100 dark:divide-gray-700">
+        <AnimatePresence initial={false}>
+          {(data?.bonusHistory || []).map((b, idx) => (
+            <motion.div
+              key={b?._id || idx}
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -6 }}
+              transition={{ duration: 0.2 }}
+              className="md:grid md:grid-cols-5 gap-4 p-4 text-sm flex flex-col"
+            >
+              {/* ✅ Desktop Layout */}
+              <div className="hidden md:block font-medium text-gray-800 dark:text-gray-100">
+                Lv. {b?.level || "-"}
+              </div>
+              <div className="hidden md:block text-gray-700 dark:text-gray-200">
+                {(b?.bonusAmount)}
+              </div>
+              <div className="hidden md:block text-gray-700 dark:text-gray-200 capitalize">
+                {b?.rewardType || "-"}
+              </div>
+              <div className="hidden md:block">
+                <span
+                  className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium
+                    ${
+                      b?.status === "paid"
+                        ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400"
+                        : b?.status === "approved"
+                        ? "bg-blue-50 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400"
+                        : "bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400"
+                    }`}
+                >
+                  {String(b?.status || "-")}
+                </span>
+              </div>
+              <div className="hidden md:block text-gray-500 dark:text-gray-400">
+                {shortDate(b?.date)}
+              </div>
+
+              {/* ✅ Mobile Layout (Card Style) */}
+              <div className="flex flex-col md:hidden bg-white/80 dark:bg-gray-900/40 rounded-xl border border-gray-100 dark:border-gray-700 p-3 mb-3 shadow-sm">
+                <div className="flex justify-between text-sm font-semibold text-gray-800 dark:text-gray-100">
+                  <span>Lv. {b?.level}</span>
+                  <span>{(b?.bonusAmount)}</span>
+                </div>
+                <div className="flex justify-between mt-2 text-xs text-gray-500 dark:text-gray-400">
+                  <span className="capitalize">{b?.rewardType}</span>
+                  <span>{shortDate(b?.date)}</span>
+                </div>
+                <div className="mt-2">
+                  <span
+                    className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium
+                      ${
+                        b?.status === "paid"
+                          ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400"
+                          : b?.status === "approved"
+                          ? "bg-blue-50 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400"
+                          : "bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400"
+                      }`}
+                  >
+                    {String(b?.status || "-")}
+                  </span>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+
+          {!data?.bonusHistory?.length && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="p-6 text-center text-gray-500 dark:text-gray-400"
+            >
+              No bonus records found.
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    </div>
+  )}
+</section>
+
+
+
+
+
+
+
+
+
+
+
 
       {/* Chart + Alerts */}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 md:gap-5 mb-6">

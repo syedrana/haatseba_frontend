@@ -3,11 +3,12 @@
 import axios from 'axios';
 import clsx from 'clsx';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ChevronDown, Home, LogOut, Menu, Moon, Sun, User, X } from 'lucide-react';
+import { ChevronDown, Home, LogOut, Menu, Moon, Network, Store, Sun, User, Wallet, X } from 'lucide-react';
 import Image from "next/image";
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
+import { Toaster } from "react-hot-toast";
 
 export default function DashboardLayout({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -24,17 +25,9 @@ export default function DashboardLayout({ children }) {
   const menuItems = useMemo(
     () => [
     { name: 'Dashboard', href: '/dashboard', icon: Home },
-    { name: 'Downline Tree', href: '/dashboard/downline', icon: Home },
-    { name: 'Become A Vendor', href: '/dashboard/vendor/request', icon: Home },
-    // { 
-    //   name: 'Finance', 
-    //   icon: CreditCard,
-    //   children: [
-    //     { name: 'Deposit', href: '/dashboard/deposit' },
-    //     { name: 'Withdraw', href: '/dashboard/withdraw' },
-    //   ]
-    // },
-    //{ name: 'Become A Vendor', href: '/dashboard/vendor/request', icon: FileText },
+    { name: 'Downline Tree', href: '/dashboard/downline', icon: Network },
+    { name: 'Withdraw Request', href: '/dashboard/withdraw/requests', icon: Wallet },
+    { name: 'Become A Vendor', href: '/dashboard/vendor/request', icon: Store },
     { name: 'Profile', href: '/dashboard/profile', icon: User },
   ],
     []
@@ -436,6 +429,7 @@ export default function DashboardLayout({ children }) {
 
         <main className="flex-1 overflow-y-auto p-4 md:p-6">
           {children}
+          <Toaster position="top-center" reverseOrder={false} />
         </main>
       </div>
     </div>

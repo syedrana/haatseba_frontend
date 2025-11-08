@@ -70,6 +70,37 @@ export default function ProfilePage() {
         </CardContent>
       </Card>
 
+      {/* Referral Link Section */}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3, delay: 0.2 }}
+        className="rounded-2xl bg-white/60 dark:bg-gray-800/60 backdrop-blur p-5 shadow-sm border border-gray-100 dark:border-gray-700 mt-6"
+      >
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-base font-semibold text-gray-900 dark:text-white">Referral Link</h3>
+        </div>
+
+        <div className="flex flex-col md:flex-row items-start md:items-center gap-3">
+          <div className="flex-1 break-all text-sm text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2 bg-white/80 dark:bg-gray-900/40">
+            {`${process.env.NEXT_PUBLIC_FRONTEND_URL || "http://localhost:3000"}/register?ref=${user?.referralCode || "XXXXXX"}`}
+          </div>
+          <button
+            onClick={() => {
+              const link = `${process.env.NEXT_PUBLIC_FRONTEND_URL || "http://localhost:3000"}/register?ref=${user?.referralCode || ""}`;
+              navigator.clipboard.writeText(link);
+              alert("Referral link copied ✅");
+            }}
+            className="px-4 py-2 bg-gray-900 text-white dark:bg-white dark:text-gray-900 rounded-xl shadow-sm hover:opacity-90 transition text-sm"
+          >
+            Copy
+          </button>
+        </div>
+        <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+          Share this link with your friends — they’ll join under your network.
+        </p>
+      </motion.div>
+
       <div className="grid md:grid-cols-2 gap-6 mt-8">
         {/* Address & Status */}
         <Card className="p-6 shadow-md rounded-2xl">
@@ -78,14 +109,14 @@ export default function ProfilePage() {
           <p><span className="font-medium">Address:</span> {user.address}</p>
           <p><span className="font-medium">Status:</span> {user.status}</p>
           <p><span className="font-medium">Role:</span> {user.role}</p>
+          <p><span className="font-medium">Level:</span> {user.level}</p>
+          <p><span className="font-medium">Referral Code:</span> {user.referralCode}</p>
         </Card>
 
         {/* Referral Info */}
         <Card className="p-6 shadow-md rounded-2xl">
           <h3 className="text-xl font-semibold mb-3">Referral Info</h3>
           <Separator className="mb-3" />
-          <p><span className="font-medium">Referral Code:</span> {user.referralCode}</p>
-          <p><span className="font-medium">Your Level:</span> {user.level}</p>
           <p><span className="font-medium">Referred By:</span> {user.referredBy || "N/A"}</p>
           <p><span className="font-medium">Referral Placement:</span> {user.placementPosition || "N/A"}</p>
           <p><span className="font-medium">Referrer&apos;s Name:</span> {referrer.name}</p>

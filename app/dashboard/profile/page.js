@@ -74,14 +74,14 @@ export default function ProfilePage() {
           <p><span className="font-medium">Address:</span> {user.address}</p>
           <p><span className="font-medium">Status:</span> {user.status}</p>
           <p><span className="font-medium">Role:</span> {user.role}</p>
+          <p><span className="font-medium">Referral Code:</span> {user.referralCode}</p>
+          <p><span className="font-medium">Level:</span> {user.level}</p>
         </Card>
 
         {/* Referral Info */}
         <Card className="p-6 shadow-md rounded-2xl">
           <h3 className="text-xl font-semibold mb-3">Referral Info</h3>
           <Separator className="mb-3" />
-          <p><span className="font-medium">Referral Code:</span> {user.referralCode}</p>
-          <p><span className="font-medium">Your Level:</span> {user.level}</p>
           <p><span className="font-medium">Referred By:</span> {user.referredBy || "N/A"}</p>
           <p><span className="font-medium">Referral Placement:</span> {user.placementPosition || "N/A"}</p>
           <p><span className="font-medium">Referrer&apos;s Name:</span> {referrer.name}</p>
