@@ -294,9 +294,9 @@ export default function RegisterForm() {
         {/* Payment Info */}
         <div className="p-4 rounded-lg bg-yellow-50 border border-yellow-300 text-yellow-800 text-sm">
           <p>
-            Please payment your <strong>registration fee</strong> to the following bKash merchant account:
+            Please <strong>Send Money</strong> your registration fee, <strong>BDT 20</strong> to the following official <strong>Personal BKash/Nagad/Rocket</strong> account:
           </p>
-          <p className="text-lg font-semibold mt-1">📱 01XXXXXXXXX</p>
+          <p className="text-lg font-semibold mt-1">📱 01304245543</p>
           <p className="mt-1 text-gray-600">
             After payment, enter your <strong>Transaction ID</strong> below.
           </p>

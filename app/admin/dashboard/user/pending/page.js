@@ -5,7 +5,10 @@ import axios from "axios";
 import { motion } from "framer-motion";
 import { CheckCircle, Loader2, Search, XCircle } from "lucide-react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
+
+
 
 // api connection
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:7000";
@@ -21,6 +24,7 @@ function WithdrawTable({ type }) {
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const router = useRouter();
 
   // ✅ Safe highlight function
   const highlight = (text) => {
@@ -109,6 +113,8 @@ function WithdrawTable({ type }) {
     if (type === "rejected") return "bg-red-50 dark:bg-red-900/50";
     return "";
   };
+
+  
 
   return (
     <div className="text-gray-900 dark:text-gray-100">
@@ -220,7 +226,7 @@ function WithdrawTable({ type }) {
                     {highlight(w?.parentId?.placementPosition || "")}
                   </td>
                   <td className="px-4 py-2 text-center flex gap-2 justify-center">
-                    {type === "pending" && (
+                    {type === "pending" ? (
                       <>
                         <button
                           onClick={() => handleAction(w._id, "approve")}
@@ -247,7 +253,26 @@ function WithdrawTable({ type }) {
                           Reject
                         </button>
                       </>
-                    )}
+                    ): type === "approved" ? (
+                      <>
+                        {/* 🧾 Details Button */}
+                        <button
+                          onClick={() => router.push(`/admin/dashboard/details/${w._id}`)}
+                          className="flex items-center gap-1 px-3 py-1 rounded-lg bg-blue-500 text-white hover:bg-blue-600"
+                        >
+                          <CheckCircle className="h-4 w-4" />
+                          Details
+                        </button>
+
+                        {/* 🌳 Tree Button */}
+                        <button
+                          onClick={() => router.push(`/admin/dashboard/tree/${w._id}`)}
+                          className="flex items-center gap-1 px-3 py-1 rounded-lg bg-amber-500 text-white hover:bg-amber-600"
+                        >
+                          🌳 Tree
+                        </button>
+                      </>
+                    ) : null}
                   </td>
                 </motion.tr>
               ))
