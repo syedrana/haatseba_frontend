@@ -356,7 +356,7 @@ function WithdrawTable({ type }) {
                 }).format(new Date(w.createdAt))}
               </div>
 
-              {type === "pending" && (
+              {/* {type === "pending" && (
                 <div className="flex gap-2">
                   <button
                     onClick={() => handleAction(w._id, "approve")}
@@ -383,7 +383,54 @@ function WithdrawTable({ type }) {
                     Reject
                   </button>
                 </div>
-              )}
+              )} */}
+              {type === "pending" ? (
+                <>
+                  <button
+                    onClick={() => handleAction(w._id, "approve")}
+                    disabled={actionLoading === w._id + "approve"}
+                    className="flex items-center gap-1 px-3 py-1 rounded-lg bg-green-500 text-white hover:bg-green-600 disabled:opacity-50"
+                  >
+                    {actionLoading === w._id + "approve" ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <CheckCircle className="h-4 w-4" />
+                    )}
+                    Approve
+                  </button>
+                  <button
+                    onClick={() => handleAction(w._id, "reject")}
+                    disabled={actionLoading === w._id + "reject"}
+                    className="flex items-center gap-1 px-3 py-1 rounded-lg bg-red-500 text-white hover:bg-red-600 disabled:opacity-50"
+                  >
+                    {actionLoading === w._id + "reject" ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <XCircle className="h-4 w-4" />
+                    )}
+                    Reject
+                  </button>
+                </>
+              ): type === "approved" ? (
+                <>
+                  {/* 🧾 Details Button */}
+                  <button
+                    onClick={() => router.push(`/admin/dashboard/details/${w._id}`)}
+                    className="flex items-center gap-1 px-3 py-1 rounded-lg bg-blue-500 text-white hover:bg-blue-600"
+                  >
+                    <CheckCircle className="h-4 w-4" />
+                    Details
+                  </button>
+
+                  {/* 🌳 Tree Button */}
+                  <button
+                    onClick={() => router.push(`/admin/dashboard/tree/${w._id}`)}
+                    className="flex items-center gap-1 px-3 py-1 rounded-lg bg-amber-500 text-white hover:bg-amber-600"
+                  >
+                    🌳 Tree
+                  </button>
+                </>
+              ) : null}
             </motion.div>
           ))
         ) : (
