@@ -416,7 +416,7 @@ function WithdrawTable({ type }) {
                   {/* 🧾 Details Button */}
                   <button
                     onClick={() => router.push(`/admin/dashboard/details/${w._id}`)}
-                    className="flex items-center gap-1 px-3 py-1 rounded-lg bg-blue-500 text-white hover:bg-blue-600"
+                    className="flex items-center gap-2 px-3 py-1 rounded-lg bg-blue-500 text-white hover:bg-blue-600"
                   >
                     <CheckCircle className="h-4 w-4" />
                     Details
@@ -425,7 +425,7 @@ function WithdrawTable({ type }) {
                   {/* 🌳 Tree Button */}
                   <button
                     onClick={() => router.push(`/admin/dashboard/tree/${w._id}`)}
-                    className="flex items-center gap-1 px-3 py-1 rounded-lg bg-amber-500 text-white hover:bg-amber-600"
+                    className="flex items-center gap-2 px-3 py-1 rounded-lg bg-amber-500 text-white hover:bg-amber-600"
                   >
                     🌳 Tree
                   </button>

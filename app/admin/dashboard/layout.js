@@ -3,7 +3,7 @@
 import clsx from 'clsx';
 import { AnimatePresence, motion } from 'framer-motion';
 import { jwtDecode } from "jwt-decode";
-import { Banknote, ChevronDown, LayoutDashboard, LogOut, Menu, Moon, Network, ReceiptText, Sun, User, UserCog, X } from 'lucide-react';
+import { Banknote, ChevronDown, LayoutDashboard, LogOut, Menu, Moon, ReceiptText, Sun, User, UserCog, X } from 'lucide-react';
 import Image from "next/image";
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -53,7 +53,6 @@ export default function DashboardLayout({ children }) {
   const menuItems = useMemo(
   () => [
     { name: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
-    { name: "Downline Tree", href: "/admin/dashboard/downline", icon: Network },
     { name: "User Management", href: "/admin/dashboard/user/pending", icon: UserCog },
     { name: "Withdrawal Management", href: "/admin/dashboard/withdrawal/pending", icon: Banknote },
     { name: "Transactions", href: "/admin/dashboard/transaction", icon: ReceiptText },
