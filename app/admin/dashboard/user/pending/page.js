@@ -183,6 +183,9 @@ function WithdrawTable({ type }) {
                       <div className="text-gray-400 text-xs">
                         {highlight(w?.phone)}
                       </div>
+                      <div className="text-gray-400 text-xs">
+                        {highlight(w?.address)}
+                      </div>
                       <div className="text-gray-500 dark:text-gray-400 text-xs">
                         {highlight(
                           w?.isEmailVerified
@@ -192,7 +195,7 @@ function WithdrawTable({ type }) {
                       </div>
                     </div>
                   </td>
-                  <td className="px-4 py-2">{highlight(w?.address)}</td>
+                  <td className="px-4 py-2">{highlight(w?.depositTransactionId)}</td>
                   <td className="px-4 py-2 text-gray-500 dark:text-gray-400">
                     {new Intl.DateTimeFormat("en-US", {
                       dateStyle: "medium",
@@ -319,6 +322,7 @@ function WithdrawTable({ type }) {
                   <div className="text-gray-500 dark:text-gray-400">{highlight(w.email || "")}</div>
                   <div className="text-gray-400 text-xs">{highlight(w.phone || "")}</div>
                   <div className="text-gray-500 text-xs dark:text-gray-400">{highlight(w.address || "")}</div>
+                  <div className="font-semibold">{highlight(w.depositTransactionId || "")}</div>
                 </div>
               </div>
 
@@ -413,6 +417,7 @@ function WithdrawTable({ type }) {
                 </>
               ): type === "approved" ? (
                 <>
+                <div className="flex items-center gap-3">
                   {/* 🧾 Details Button */}
                   <button
                     onClick={() => router.push(`/admin/dashboard/details/${w._id}`)}
@@ -429,6 +434,7 @@ function WithdrawTable({ type }) {
                   >
                     🌳 Tree
                   </button>
+                </div>
                 </>
               ) : null}
             </motion.div>

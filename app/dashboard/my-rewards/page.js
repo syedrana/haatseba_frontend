@@ -170,7 +170,8 @@ export default function MyRewardsPage({ darkMode = false }) {
                     <StatusBadge status={b.status} />
                     {/* small actions */}
                     <div className="flex gap-2">
-                      {b.rewardType === "product" && b.status === "approved" && (
+                      {/* && b.status === "approved" */}
+                      {b.rewardType === "product"  && (
                         <button
                           onClick={() => openClaimModal(b)}
                           className="px-3 py-1 text-sm rounded-md bg-emerald-600 text-white hover:bg-emerald-700"
@@ -178,8 +179,8 @@ export default function MyRewardsPage({ darkMode = false }) {
                           Claim
                         </button>
                       )}
-
-                      {b.rewardType === "cash" && (b.status === "paid" || b.status === "approved") && (
+{/* && (b.status === "paid" || b.status === "approved") */}
+                      {b.rewardType === "cash"  && (
                         <button
                           onClick={() => toast("Cash already credited to your wallet. Withdraw from Wallet page.")}
                           className="px-3 py-1 text-sm rounded-md bg-indigo-600 text-white hover:bg-indigo-700"

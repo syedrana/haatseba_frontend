@@ -57,7 +57,16 @@ export default function DashboardLayout({ children }) {
     { name: "Withdrawal Management", href: "/admin/dashboard/withdrawal/pending", icon: Banknote },
     { name: "Transactions", href: "/admin/dashboard/transaction", icon: ReceiptText },
     { name: "Vendor Management", href: "/admin/dashboard/vendor-requests", icon: ReceiptText },
-    { name: "Bonus Management", href: "/admin/dashboard/bonus-management", icon: ReceiptText },
+    //{ name: "Bonus Management", href: "/admin/dashboard/bonus-management", icon: ReceiptText },
+    { 
+      name: 'Bonus Management', 
+      icon: ReceiptText,
+      children: [
+        { name: 'Bonuses', href: "/admin/dashboard/bonus-management/bonuses" },
+        { name: 'Bonus Approval', href: "/admin/dashboard/bonus-management/bonus-approval" },
+        { name: 'Bonus Plan', href: "/admin/dashboard/bonus-management" },
+      ]
+    },
   ],
   []
 );

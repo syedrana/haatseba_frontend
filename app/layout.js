@@ -13,31 +13,31 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "Haat Seba | Secure Savings",
-  description: "Trust1x DPS is a secure and profitable savings platform. Build your future through monthly deposits.",
-  keywords: ["Trust1x", "Trust1x dps", "DPS", "monthly savings", "investment", "Bangladesh"],
-  author: "Trust1x Team",
-  metadataBase: new URL('https://trust1xdps.com'),
+  title: "Haat Seba | Secure Marketing",
+  description: "Haat Seba is a secure and profitable eCommarces platform. Build your future through monthly deposits.",
+  keywords: ["haatseba", "Haat Seba", "haat seba", "HaatSeba", "investment", "Bangladesh"],
+  author: "Haat Seba",
+  metadataBase: new URL('https://haatseba.com'),
   openGraph: {
-    title: "Trust1x DPS | Secure Savings",
+    title: "Haat Seba | Secure Marketing",
     description: "A secure and profitable monthly savings and investment plan",
-    url: "https://trust1xdps.com",
-    siteName: "Trust1x DPS",
+    url: "https://haatseba.com",
+    siteName: "Haat Seba",
     images: [
       {
-        url: "https://trust1xdps.com/trust1x.png",
+        url: "https://haatseba.com/trust1x.png",
         width: 1200,
         height: 630,
-        alt: "Trust1x DPS Open Graph Image",
+        alt: "Haat Seba Open Graph Image",
       },
     ],
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Trust1x DPS",
+    title: "Haat Seba",
     description: "A secure monthly savings platform",
-    images: ["https://trust1xdps.com/trust1x.png"],
+    images: ["https://haatseba.com/trust1x.png"],
   },
   robots: "index, follow",
 };
