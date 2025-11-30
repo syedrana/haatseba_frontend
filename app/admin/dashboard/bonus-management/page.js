@@ -243,8 +243,9 @@ export default function BonusAdminPanel() {
           >
             <option value="" disabled hidden></option>
             <option value="cash">Cash</option>
-            <option value="product">Product / Gift</option>
-            <option value="other">Other</option>
+            <option value="product">Product</option>
+            <option value="other">mobile_recharge</option>
+            <option value="other">none</option>
           </select>
           <label
             htmlFor="rewardType"

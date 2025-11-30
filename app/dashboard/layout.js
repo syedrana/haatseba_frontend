@@ -26,7 +26,14 @@ export default function DashboardLayout({ children }) {
     () => [
     { name: 'Dashboard', href: '/dashboard', icon: Home },
     { name: 'Downline Tree', href: '/dashboard/downline', icon: Network },
-    { name: 'My Rewards', href: '/dashboard/my-rewards', icon: Network },
+    { 
+      name: 'My Rewards', 
+      icon: Network,
+      children: [
+        { name: 'Rewards', href: "/dashboard/my-rewards" },
+        { name: 'Claims', href: "/dashboard/my-rewards/claims" },
+      ]
+    },
     { name: 'Withdraw Request', href: '/dashboard/withdraw/requests', icon: Wallet },
     { name: 'Become A Vendor', href: '/dashboard/vendor/request', icon: Store },
     { name: 'Profile', href: '/dashboard/profile', icon: User },
