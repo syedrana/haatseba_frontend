@@ -441,11 +441,31 @@ export default function MyRewardsPage({ darkMode = false }) {
                       <p className="text-lg font-semibold mt-1">
                         {r.rewardType === "cash"
                           ? `BDT ${Number(r.bonusAmount)}`
-                          : r.productId?.name || "Product"}
+                          : r.bonusAmount || "Product"}
                       </p>
                       <p className="text-xs text-gray-400">
                         Issued: {new Date(r.createdAt).toLocaleDateString()}
                       </p>
+                      {/* 🔥 SHOW MOBILE RECHARGE DETAILS WHEN PAID */}
+                      {r.rewardType === "mobile_recharge" && r.status === "paid" && (
+                        <>
+                          <p className="text-xs text-green-600 mt-1">
+                            Recharge Number: <span className="font-medium">{r.rechargeNumber}</span>
+                          </p>
+
+                          {r.transactionId && (
+                            <p className="text-xs text-blue-600">
+                              Transaction ID: <span className="font-medium">{r.transactionId}</span>
+                            </p>
+                          )}
+
+                          {r.adminNote && (
+                            <p className="mt-1 text-xs text-orange-500 italic">
+                              Admin Note: {r.adminNote}
+                            </p>
+                          )}
+                        </>
+                      )}
                     </div>
                   </div>
 

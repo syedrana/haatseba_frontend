@@ -222,7 +222,7 @@ useEffect(() => {
               className="rounded-2xl bg-white/60 dark:bg-gray-800/60 backdrop-blur p-5 shadow-sm border border-gray-100 dark:border-gray-700"
             >
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-500 dark:text-gray-400">Total Bonus</span>
+                <span className="text-sm text-gray-500 dark:text-gray-400">MLM Bonus</span>
                 <TrendingUp className="w-5 h-5 text-gray-400" />
               </div>
               <div className="text-2xl font-semibold mt-2">{currency(data.totalBonus)}</div>
