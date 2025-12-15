@@ -107,7 +107,9 @@ export default function RegisterForm() {
     nomineePhone: "",
     nomineeAddress: "",
     placementPosition: "",
-    depositTransactionId: "", // ✅ new field
+    depositTransactionId: "", 
+    registrationType: "deposit",
+    productIds: [],
   });
   const [showPw, setShowPw] = useState(false);
   const [showCPw, setShowCPw] = useState(false);
@@ -116,6 +118,27 @@ export default function RegisterForm() {
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
   const dropRef = useRef(null);
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    const loadProducts = async () => {
+      try {
+        const res = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE}/registerproduct`,
+          {
+            headers: {
+              Authorization: process.env.NEXT_PUBLIC_API_KEY,
+            },
+          }
+        );
+
+        setProducts(res.data.products || []);
+      } catch (err) {
+        console.error("Product load error:", err);
+      }
+    };
+
+    loadProducts();
+  }, []);
 
   useEffect(() => {
     if (refCode) {
@@ -178,8 +201,11 @@ export default function RegisterForm() {
       e.nomineeAddress = "Nominee address is required";
     if (!form.placementPosition)
       e.placementPosition = "Placement position is required";
-    if (!form.depositTransactionId.trim())
-      e.depositTransactionId = "Transaction ID is required"; 
+    if (form.registrationType === "deposit" && !form.depositTransactionId.trim())
+      e.depositTransactionId = "Transaction ID is required";
+    if (form.registrationType === "product" && form.productIds.length === 0) {
+      e.productIds = "Select at least one product";
+    } 
     if (!form.referralCode.trim())
       e.referralCode = "Referred code is required";
     if (!imgFile) e.image = "User image is required";
@@ -212,12 +238,6 @@ export default function RegisterForm() {
           formData.append(key, val.trim());
         }
       });
-      // nominee object
-      // formData.append("nominee[firstName]", form.nomineeFirstName.trim());
-      // formData.append("nominee[lastName]", form.nomineeLastName.trim());
-      // formData.append("nominee[relation]", form.nomineeRelation.trim());
-      // formData.append("nominee[phone]", form.nomineePhone.trim());
-      // formData.append("nominee[address]", form.nomineeAddress.trim());
 
       formData.append("nominee", JSON.stringify({
         firstName: form.nomineeFirstName.trim(),
@@ -236,7 +256,6 @@ export default function RegisterForm() {
         {
           headers: {
             Authorization: process.env.NEXT_PUBLIC_API_KEY,
-            "Content-Type": "multipart/form-data",
           },
           timeout: 90000,
         }
@@ -263,6 +282,8 @@ export default function RegisterForm() {
         nomineeAddress: "",
         placementPosition: "",
         depositTransactionId: "",
+        registrationType: "",
+        productIds: "",
       });
       setImgFile(null);
       setPreview(null);
@@ -291,25 +312,151 @@ export default function RegisterForm() {
           Create an Account
         </h2>
 
-        {/* Payment Info */}
-        <div className="p-4 rounded-lg bg-yellow-50 border border-yellow-300 text-yellow-800 text-sm">
-          <p>
-            Please <strong>Send Money</strong> your registration fee, <strong>BDT 20</strong> to the following official <strong>Personal BKash/Nagad/Rocket</strong> account:
-          </p>
-          <p className="text-lg font-semibold mt-1">📱 01304245543</p>
-          <p className="mt-1 text-gray-600">
-            After payment, enter your <strong>Transaction ID</strong> below.
-          </p>
+        
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <label>
+            <input
+              type="radio"
+              value="deposit"
+              checked={form.registrationType === "deposit"}
+              onChange={(e) => setForm({ ...form, registrationType: e.target.value })}
+            /> Deposit Registration
+          </label>
+
+          <label>
+            <input
+              type="radio"
+              value="product"
+              checked={form.registrationType === "product"}
+              onChange={(e) => setForm({ ...form, registrationType: e.target.value })}
+            /> Product Registration
+          </label>
         </div>
 
-        {/* Transaction ID */}
-        <FloatingInput
-          label="bKash Transaction ID"
-          name="depositTransactionId"
-          value={form.depositTransactionId}
-          onChange={onChange}
-          error={errors.depositTransactionId}
-        />
+        {form.registrationType === "deposit" && (
+          <div>
+            {/* Payment Info */}
+            <div className="p-4 mb-6 rounded-lg bg-yellow-50 border border-yellow-300 text-yellow-800 text-sm">
+              <p>
+                Please <strong>Send Money</strong> your registration fee, <strong>BDT 20</strong> to the following official <strong>Personal BKash/Nagad/Rocket</strong> account:
+              </p>
+              <p className="text-lg font-semibold mt-1">📱 01304245543</p>
+              <p className="mt-1 text-gray-600">
+                After payment, enter your <strong>Transaction ID</strong> below.
+              </p>
+            </div>
+            
+            {/* Transaction ID */}
+            <FloatingInput
+              label="Transaction ID"
+              name="depositTransactionId"
+              value={form.depositTransactionId}
+              onChange={onChange}
+              error={errors.depositTransactionId}
+            />
+          </div>
+        )}
+
+        
+
+        {/* {form.registrationType === "product" && (
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Select Products</label>
+
+            <div className="border rounded-xl p-3 h-40 overflow-y-auto">
+              <select
+                multiple
+                className="w-full h-full outline-none"
+                value={form.productIds}
+                onChange={(e) => {
+                  const values = [...e.target.selectedOptions].map((o) => o.value);
+                  setForm({ ...form, productIds: values });
+                }}
+              >
+                {products.map((p) => (
+                  <option key={p._id} value={p._id}>
+                    {p.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {errors.productIds && (
+              <p className="text-xs text-red-500">{errors.productIds}</p>
+            )}
+          </div>
+        )} */}
+
+        {form.registrationType === "product" && (
+  <div className="space-y-2">
+    <label className="text-sm font-medium">Select Products</label>
+
+    {/* Selected Tags */}
+    <div className="flex flex-wrap gap-2 mb-2">
+      {form.productIds.map((id) => {
+        const product = products.find((p) => p._id === id);
+        if (!product) return null;
+        return (
+          <span
+            key={id}
+            className="flex items-center bg-indigo-100 text-indigo-700 px-2 py-1 rounded-full text-sm font-medium"
+          >
+            {product.name}
+            <button
+              type="button"
+              onClick={() =>
+                setForm({
+                  ...form,
+                  productIds: form.productIds.filter((pid) => pid !== id),
+                })
+              }
+              className="ml-1 text-indigo-500 font-bold hover:text-indigo-700 transition"
+            >
+              ×
+            </button>
+          </span>
+        );
+      })}
+    </div>
+
+    {/* Product List */}
+    <div className="border rounded-xl p-3 h-40 overflow-y-auto bg-white shadow-sm">
+      {products.length === 0 ? (
+        <p className="text-gray-400 text-sm">No products available</p>
+      ) : (
+        products.map((p) => {
+          const selected = form.productIds.includes(p._id);
+          return (
+            <div
+              key={p._id}
+              className={`flex items-center justify-between px-3 py-2 mb-1 rounded-lg cursor-pointer transition-all
+                ${selected ? "bg-indigo-100 text-indigo-700 font-semibold" : "hover:bg-gray-100"}`}
+              onClick={() => {
+                const newIds = selected
+                  ? form.productIds.filter((id) => id !== p._id)
+                  : [...form.productIds, p._id];
+                setForm({ ...form, productIds: newIds });
+              }}
+            >
+              <span>{p.name}</span>
+              {selected && <span className="text-indigo-500 font-bold">✔</span>}
+            </div>
+          );
+        })
+      )}
+    </div>
+
+    {errors.productIds && (
+      <p className="text-xs text-red-500">{errors.productIds}</p>
+    )}
+  </div>
+)}
+
+
+
+
+        
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <FloatingInput
@@ -539,3 +686,4 @@ export default function RegisterForm() {
     </div>
   );
 }
+

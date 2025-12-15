@@ -6,7 +6,7 @@ import axios from "axios";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { getReferrerInfo } from "../../utils/getReferrer";
+import { getReferrerInfo } from "../../../utils/getReferrer";
 
 
 

@@ -58,7 +58,7 @@ export default function Login() {
       setError("");
 
       if (role === "user") {
-        setTimeout(() => router.replace("/dashboard"), 500);
+        setTimeout(() => router.replace("/dashboard/marketplace/shop"), 500);
       } else router.replace("/login");
 
     } catch (err) {

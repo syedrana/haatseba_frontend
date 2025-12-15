@@ -3,7 +3,7 @@
 import axios from 'axios';
 import clsx from 'clsx';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ChevronDown, Home, LogOut, Menu, Moon, Network, Store, Sun, User, Wallet, X } from 'lucide-react';
+import { Boxes, Briefcase, ChevronDown, FileCheck, Gift, Home, LogOut, Menu, Moon, Network, Package, Receipt, ShoppingBag, ShoppingCart, Store, Sun, Trophy, User, UserPlus, Wallet, X } from 'lucide-react';
 import Image from "next/image";
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -20,26 +20,99 @@ export default function DashboardLayout({ children }) {
   const pathname = usePathname(); // Next.js hook for current route
   const router = useRouter();
 
-  // Nested menu structure
-   
-  const menuItems = useMemo(
-    () => [
-    { name: 'Dashboard', href: '/dashboard', icon: Home },
-    { name: 'Downline Tree', href: '/dashboard/downline', icon: Network },
-    { 
-      name: 'My Rewards', 
-      icon: Network,
+  const menuItems = useMemo(() => {
+  if (!user) return [];
+
+  //const isAgent = Boolean(user.isAgent);
+  const isVendor = Boolean(user.isVendor);
+  console.log("isVendor:", user?.isVendor);
+
+
+  const items = [
+    {
+      name: "Marketplace",
+      icon: Store,
       children: [
-        { name: 'Rewards', href: "/dashboard/my-rewards" },
-        { name: 'Claims', href: "/dashboard/my-rewards/claims" },
+        { name: "Shop", href: "/dashboard/marketplace/shop", icon: ShoppingBag },
+        { name: "My Orders", href: "/dashboard/orders", icon: Receipt },
       ]
     },
-    { name: 'Withdraw Request', href: '/dashboard/withdraw/requests', icon: Wallet },
-    { name: 'Become A Vendor', href: '/dashboard/vendor/request', icon: Store },
-    { name: 'Profile', href: '/dashboard/profile', icon: User },
-  ],
-    []
-  );
+    {
+      name: 'MLM Integration',
+      icon: Gift,
+      children: [
+        { name: 'Earnings & Network', href: '/dashboard', icon: Home },
+        { name: 'Downline Tree', href: '/dashboard/downline', icon: Network },
+        { name: 'My Referral', href: "/dashboard/my-rewards", icon: Trophy },
+        { name: 'Levels & Matrix', href: "/dashboard/my-rewards/claims", icon: FileCheck },
+      ]
+    },
+    {
+      name: 'Rewards Zone',
+      icon: Gift,
+      children: [
+        { name: 'My Rewards', href: "/dashboard/my-rewards", icon: Trophy },
+        { name: 'My Claims', href: "/dashboard/my-rewards/claims", icon: FileCheck },
+        { name: 'My Wallet', href: "/dashboard/withdraw/requests", icon: Wallet },
+      ]
+    },
+    {
+      name: "Joining Products",
+      icon: Package,
+      children: [
+        { name: 'Buy Joining Product', href: "/dashboard/agent/request", icon: ShoppingCart },
+        { name: 'My Joining Stock', href: "/dashboard/agent/stock", icon: Boxes },
+      ]
+    },
+
+    // 🟦 Agent Section
+    // isAgent
+    //   ? {
+    //       name: "Shop Portal",
+    //       icon: Briefcase,
+    //       children: [
+    //         { name: 'Buy Product', href: "/dashboard/agent/request", icon: ShoppingCart },
+    //         { name: 'My Stock', href: "/dashboard/agent/stock", icon: Boxes },
+    //       ]
+    //     }
+    //   : {
+    //       name: "Become An Agent",
+    //       href: "/dashboard/agent/request",
+    //       icon: UserPlus
+    //     },
+
+    // 🟩 Vendor Section
+    isVendor
+      ? {
+          name: "Vendor Portal",
+          icon: Briefcase,
+          children: [
+            { name: 'Add Product', href: "/dashboard/vendor/add-product", icon: ShoppingCart },
+            { name: 'My Stock', href: "/dashboard/vendor/stock", icon: Boxes },
+          ]
+        }
+      : {
+          name: "Become A Vendor",
+          href: "/dashboard/vendor/request",
+          icon: UserPlus
+        },
+
+    {
+      name: 'Profile Zone',
+      icon: User,
+      children: [
+        { name: 'View Profile', href: '/dashboard/profile/view', icon: User },
+        { name: 'Edit Profile', href: "/dashboard/profile/edit-profile", icon: FileCheck },
+        { name: 'Change Password', href: "/dashboard/profile/change-password", icon: Lock },
+      ]
+    },
+  ];
+
+  return items;
+}, [user]);
+
+
+
 
   // Auto-expand parent if child is active
   useEffect(() => {

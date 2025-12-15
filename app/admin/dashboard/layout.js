@@ -8,6 +8,7 @@ import Image from "next/image";
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import React, { useEffect, useMemo, useState } from 'react';
+import { Toaster } from "react-hot-toast";
 
 export default function DashboardLayout({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -53,20 +54,49 @@ export default function DashboardLayout({ children }) {
   const menuItems = useMemo(
   () => [
     { name: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
-    { name: "User Management", href: "/admin/dashboard/user/pending", icon: UserCog },
-    { name: "Withdrawal Management", href: "/admin/dashboard/withdrawal/pending", icon: Banknote },
-    { name: "Transactions", href: "/admin/dashboard/transaction", icon: ReceiptText },
-    { name: "Vendor Management", href: "/admin/dashboard/vendor-requests", icon: ReceiptText },
-    
     { 
-      name: 'Bonus Management', 
+      name: 'User Management', 
+      icon: UserCog,
+      children: [
+        { name: 'Approval Pending', href: "/admin/dashboard/user/pending" },
+        { name: 'Approval Update Profile', href: "/admin/dashboard/user/approval-update-profile" },
+      ]
+    },
+    { 
+      name: 'MLM & Commission', 
       icon: ReceiptText,
       children: [
         { name: 'Bonus Plan', href: "/admin/dashboard/bonus-management" },
         { name: 'Bonuses', href: "/admin/dashboard/bonus-management/bonuses" },
         { name: 'Bonus Approval', href: "/admin/dashboard/bonus-management/bonus-approval" },
         { name: 'Complete Bonus', href: "/admin/dashboard/bonus-management/complete-bonus" },
-        { name: "Claim Management", href: "/admin/dashboard/bonus-management/claims" },
+        { name: "Claim", href: "/admin/dashboard/bonus-management/claims" },
+        { name: "Wallet", href: "/admin/dashboard/withdrawal/pending", icon: Banknote },
+        { name: "Transactions", href: "/admin/dashboard/transaction", icon: ReceiptText },
+      ]
+    },
+    { 
+      name: 'Prodduct Management', 
+      icon: ReceiptText,
+      children: [
+        { name: 'Add Category', href: "/admin/dashboard/product-management/add-category" },
+        { name: 'Add Brand', href: "/admin/dashboard/product-management/add-brand" },
+      ]
+    },
+    { 
+      name: 'Agent Management', 
+      icon: ReceiptText,
+      children: [
+        { name: 'Create Package', href: "/admin/dashboard/agent/create-package" },
+        { name: 'All Package', href: "/admin/dashboard/agent/all-package" },
+      ]
+    },
+    { 
+      name: 'Vendor Management', 
+      icon: UserCog,
+      children: [
+        { name: "Request", href: "/admin/dashboard/vendor-requests", icon: ReceiptText },
+        { name: 'Commission', href: "/admin/dashboard/vendor-requests/commission" },
       ]
     },
   ],
@@ -485,6 +515,7 @@ export default function DashboardLayout({ children }) {
         </header>
 
         <main className="flex-1 overflow-y-auto p-4 md:p-6">
+          <Toaster position="top-center" reverseOrder={false} />
           {children && React.cloneElement(children, { darkMode })}
         </main>
       </div>

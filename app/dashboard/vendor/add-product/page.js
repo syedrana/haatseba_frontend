@@ -1,518 +1,182 @@
 // "use client";
 
-// import { Button } from "@/components/ui/button";
-// import {
-//     Card,
-//     CardContent,
-//     CardHeader,
-//     CardTitle,
-// } from "@/components/ui/card";
-// import { Input } from "@/components/ui/input";
-// import { Label } from "@/components/ui/label";
-// import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-// import { Textarea } from "@/components/ui/textarea";
-// import { useToast } from "@/components/ui/use-toast";
-// import { zodResolver } from "@hookform/resolvers/zod";
 // import axios from "axios";
-// import { motion } from "framer-motion";
-// import { useEffect, useState } from "react";
-// import { useForm } from "react-hook-form";
-// import * as z from "zod";
-
-
-// // 🧾 Validation Schema (Zod)
-// const formSchema = z.object({
-//   name: z.string().min(3, "Name must be at least 3 characters"),
-//   description: z.string().min(10, "Description must be at least 10 characters"),
-//   price: z.number().min(0, "Price cannot be negative"),
-//   costPrice: z.number().min(0, "Cost cannot be negative"),
-//   discount: z.number().min(0).max(100),
-//   category: z.string().min(1, "Category is required"),
-//   brand: z.string().min(1, "Brand is required"),
-//   stock: z.number().min(1, "Stock is required"),
-//   image: z.any(),
-// });
+// import { useEffect, useRef, useState } from "react";
 
 // export default function VendorAddProductPage() {
-//   const [categories, setCategories] = useState([]);
-//   const [brands, setBrands] = useState([]);
-//   const [loading, setLoading] = useState(false);
-//   const { toast } = useToast();
-
-//   const form = useForm({
-//     resolver: zodResolver(formSchema),
-//     defaultValues: {
-//       name: "",
-//       description: "",
-//       price: 0,
-//       costPrice: 0,
-//       discount: 0,
-//       category: "",
-//       brand: "",
-//       stock: 0,
-//       image: null,
-//     },
+//   const [form, setForm] = useState({
+//     name: "",
+//     description: "",
+//     price: "",
+//     costPrice: "",
+//     discount: 0,
+//     stock: "",
+//     category: null,
+//     brand: null,
 //   });
 
-//   // 🧠 Category & Brand fetch
+//   const API_BASE = process.env.NEXT_PUBLIC_API_BASE;
+//   const token = typeof window !== "undefined" ? localStorage.getItem("token") : "";
+
+//   const [image, setImage] = useState(null);
+//   const [loading, setLoading] = useState(false);
+
+//   // 🔍 Search states
+//   const [catQuery, setCatQuery] = useState("");
+//   const [brandQuery, setBrandQuery] = useState("");
+//   const [catResults, setCatResults] = useState([]);
+//   const [brandResults, setBrandResults] = useState([]);
+
+//   const catBox = useRef(null);
+//   const brandBox = useRef(null);
+
+//   // 🔍 Category search (NO preload)
 //   useEffect(() => {
-//     const fetchData = async () => {
-//       try {
-//         const [catRes, brandRes] = await Promise.all([
-//           axios.get("/allcategories"),
-//           axios.get("/api/brand"),
-//         ]);
-//         setCategories(catRes.data?.categories || []);
-//         setBrands(brandRes.data?.brands || []);
-//       } catch (error) {
-//         console.error("Failed to fetch:", error);
-//       }
-//     };
-//     fetchData();
-//   }, []);
-
-//   // 🪄 Submit Handler
-//   const onSubmit = async (data) => {
-//     setLoading(true);
-//     try {
-//       const formData = new FormData();
-//       Object.keys(data).forEach((key) => {
-//         if (key === "image") {
-//           formData.append("image", data.image[0]);
-//         } else {
-//           formData.append(key, data[key]);
-//         }
-//       });
-
-//       const res = await axios.post("/api/vendor/product", formData, {
-//         headers: { "Content-Type": "multipart/form-data" },
-//       });
-
-//       toast({
-//         title: "✅ Product Submitted",
-//         description: "Waiting for admin approval.",
-//       });
-
-//       form.reset();
-//     } catch (err) {
-//       toast({
-//         title: "❌ Error",
-//         description: err.response?.data?.message || "Failed to submit product",
-//       });
-//     } finally {
-//       setLoading(false);
+//     if (!catQuery.trim()) {
+//       setCatResults([]);
+//       return;
 //     }
+//     const t = setTimeout(async () => {
+//       const res = await axios.get(`${API_BASE}/allcategorie?q=${catQuery}`, {
+//         headers: { Authorization: `Bearer ${token}` },
+//       });
+//       setCatResults(res.data.categories || []);
+//     }, 300);
+//     return () => clearTimeout(t);
+//   }, [API_BASE, catQuery, token]);
+
+//   // 🔍 Brand search (NO preload)
+//   useEffect(() => {
+//     if (!brandQuery.trim()) {
+//       setBrandResults([]);
+//       return;
+//     }
+//     const t = setTimeout(async () => {
+//       const res = await axios.get(`${API_BASE}/allbrands?q=${brandQuery}`, {
+//         headers: { Authorization: `Bearer ${token}` },
+//       });
+//       setBrandResults(res.data.brands || []);
+//     }, 300);
+//     return () => clearTimeout(t);
+//   }, [API_BASE, brandQuery, token]);
+
+//   const submit = async () => {
+//     setLoading(true);
+//     const fd = new FormData();
+//     Object.entries(form).forEach(([k, v]) => {
+//       if (v && typeof v === "object") fd.append(k, v._id);
+//       else fd.append(k, v);
+//     });
+//     fd.append("image", image);
+
+//     await axios.post(`${API_BASE}/vendoraddproduct`, fd, {
+//       headers: {
+//         Authorization: `Bearer ${token}`,
+//         "Content-Type": "multipart/form-data",
+//       },
+//     });
+//     setLoading(false);
+//     alert("Product submitted for approval");
 //   };
 
 //   return (
-//     <motion.div
-//       className="max-w-3xl mx-auto p-6"
-//       initial={{ opacity: 0, y: 30 }}
-//       animate={{ opacity: 1, y: 0 }}
-//     >
-//       <Card className="shadow-xl border-t-4 border-indigo-500 rounded-2xl">
-//         <CardHeader>
-//           <CardTitle className="text-2xl font-bold text-indigo-700">
-//             🛍️ Add New Product
-//           </CardTitle>
-//         </CardHeader>
+//     <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 p-6 text-white">
+//       <div className="max-w-5xl mx-auto bg-gray-900/80 backdrop-blur-xl rounded-2xl shadow-2xl p-8">
+//         <h1 className="text-3xl font-bold mb-8">➕ Add New Product</h1>
 
-//         <CardContent>
-//           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
-//             {/* Product Name */}
-//             <div className="relative">
-//               <Input
-//                 placeholder=" "
-//                 {...form.register("name")}
-//                 className="peer"
-//               />
-//               <Label className="absolute text-gray-500 text-sm transition-all peer-placeholder-shown:top-3 peer-placeholder-shown:text-gray-400 peer-placeholder-shown:text-base top-[-10px] left-2 bg-white px-1">
-//                 Product Name
-//               </Label>
-//             </div>
+//         {/* BASIC INFO */}
+//         <div className="grid md:grid-cols-2 gap-6">
+//           <input className="input" placeholder="Product Name" onChange={e => setForm({ ...form, name: e.target.value })} />
+//           <input className="input" type="number" placeholder="Price" onChange={e => setForm({ ...form, price: e.target.value })} />
+//           <input className="input" type="number" placeholder="Cost Price" onChange={e => setForm({ ...form, costPrice: e.target.value })} />
+//           <input className="input" type="number" placeholder="Stock" onChange={e => setForm({ ...form, stock: e.target.value })} />
+//         </div>
 
-//             {/* Description */}
-//             <div className="relative">
-//               <Textarea
-//                 placeholder=" "
-//                 {...form.register("description")}
-//                 rows={4}
-//                 className="peer"
-//               />
-//               <Label className="absolute text-gray-500 text-sm transition-all peer-placeholder-shown:top-3 peer-placeholder-shown:text-gray-400 peer-placeholder-shown:text-base top-[-10px] left-2 bg-white px-1">
-//                 Description
-//               </Label>
-//             </div>
+//         <textarea className="input mt-6 h-32" placeholder="Product Description" onChange={e => setForm({ ...form, description: e.target.value })} />
 
-//             {/* Price, Cost, Discount */}
-//             <div className="grid grid-cols-3 gap-4">
-//               <div>
-//                 <Label>Price</Label>
-//                 <Input type="number" {...form.register("price", { valueAsNumber: true })} />
-//               </div>
-//               <div>
-//                 <Label>Cost Price</Label>
-//                 <Input type="number" {...form.register("costPrice", { valueAsNumber: true })} />
-//               </div>
-//               <div>
-//                 <Label>Discount (%)</Label>
-//                 <Input type="number" {...form.register("discount", { valueAsNumber: true })} />
-//               </div>
-//             </div>
-
-//             {/* Category */}
-//             <div>
-//               <Label>Category</Label>
-//               <Select onValueChange={(val) => form.setValue("category", val)}>
-//                 <SelectTrigger>
-//                   <SelectValue placeholder="Select category" />
-//                 </SelectTrigger>
-//                 <SelectContent>
-//                   {categories.map((cat) => (
-//                     <SelectItem key={cat._id} value={cat._id}>
-//                       {cat.name}
-//                     </SelectItem>
-//                   ))}
-//                 </SelectContent>
-//               </Select>
-//             </div>
-
-//             {/* Brand */}
-//             <div>
-//               <Label>Brand</Label>
-//               <Select onValueChange={(val) => form.setValue("brand", val)}>
-//                 <SelectTrigger>
-//                   <SelectValue placeholder="Select brand" />
-//                 </SelectTrigger>
-//                 <SelectContent>
-//                   {brands.map((b) => (
-//                     <SelectItem key={b._id} value={b._id}>
-//                       {b.name}
-//                     </SelectItem>
-//                   ))}
-//                 </SelectContent>
-//               </Select>
-//             </div>
-
-//             {/* Stock */}
-//             <div>
-//               <Label>Stock Quantity</Label>
-//               <Input type="number" {...form.register("stock", { valueAsNumber: true })} />
-//             </div>
-
-//             {/* Image Upload */}
-//             <div>
-//               <Label>Product Image</Label>
-//               <Input type="file" accept="image/*" {...form.register("image")} />
-//             </div>
-
-//             {/* Submit */}
-//             <Button
-//               type="submit"
-//               disabled={loading}
-//               className="w-full mt-4 bg-indigo-600 hover:bg-indigo-700"
-//             >
-//               {loading ? "Submitting..." : "Submit Product"}
-//             </Button>
-//           </form>
-//         </CardContent>
-//       </Card>
-//     </motion.div>
-//   );
-// }
-
-
-
-
-
-
-
-
-
-// "use client";
-
-// import { Button } from "@/components/ui/button";
-// import {
-//     Card,
-//     CardContent,
-//     CardHeader,
-//     CardTitle,
-// } from "@/components/ui/card";
-// import { Input } from "@/components/ui/input";
-// import { Label } from "@/components/ui/label";
-// import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-// import { Textarea } from "@/components/ui/textarea";
-// import { useToast } from "@/components/ui/use-toast";
-// import { zodResolver } from "@hookform/resolvers/zod";
-// import axios from "axios";
-// import { motion } from "framer-motion";
-// import Image from "next/image";
-// import { useEffect, useState } from "react";
-// import { useForm } from "react-hook-form";
-// import * as z from "zod";
-
-// // ✅ Validation Schema
-// const formSchema = z.object({
-//   name: z.string().min(3, "Product name must be at least 3 characters"),
-//   description: z.string().min(10, "Description must be at least 10 characters"),
-//   price: z.coerce.number().min(0, "Price must be positive"),
-//   costPrice: z.coerce.number().min(0, "Cost price must be positive"),
-//   discount: z.coerce.number().min(0).max(100, "Discount must be between 0 and 100"),
-//   category: z.string().min(1, "Please select a category"),
-//   brand: z.string().min(1, "Please select a brand"),
-//   stock: z.coerce.number().min(1, "Stock quantity is required"),
-//   image: z.any().refine((files) => files?.length === 1, "Product image is required"),
-// });
-
-// export default function VendorAddProductPage() {
-//   const { toast } = useToast();
-//   const [categories, setCategories] = useState([]);
-//   const [brands, setBrands] = useState([]);
-//   const [preview, setPreview] = useState(null);
-//   const [loading, setLoading] = useState(false);
-
-//   const form = useForm({
-//     resolver: zodResolver(formSchema),
-//     defaultValues: {
-//       name: "",
-//       description: "",
-//       price: "",
-//       costPrice: "",
-//       discount: "",
-//       category: "",
-//       brand: "",
-//       stock: "",
-//       image: null,
-//     },
-//   });
-
-//   const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
-
-
-//   // 🔄 Fetch Category & Brand
-//   useEffect(() => {
-//     const fetchData = async () => {
-//       try {
-//         const [catRes, brandRes] = await Promise.all([
-//           axios.get(`${process.env.NEXT_PUBLIC_API_BASE}/allcategories`,{
-//             headers: {  
-//                 Authorization: `Bearer ${token}`
-//             },
-//           }),
-//           axios.get(`${process.env.NEXT_PUBLIC_API_BASE}/allbrands`,{
-//             headers: {  
-//                 Authorization: `Bearer ${token}`
-//             },
-//           }),
-//         ]);
-//         setCategories(catRes.data?.categories || []);
-//         setBrands(brandRes.data?.brands || []);
-//       } catch (err) {
-//         console.error("❌ Fetch error:", err);
-//       }
-//     };
-//     fetchData();
-//   }, []);
-
-//   // 🖼️ Image Preview
-//   const handleImageChange = (e) => {
-//     const file = e.target.files?.[0];
-//     if (file) {
-//       form.setValue("image", e.target.files);
-//       setPreview(URL.createObjectURL(file));
-//     }
-//   };
-
-//   // 🪄 Submit Handler
-//   const onSubmit = async (data) => {
-//     setLoading(true);
-//     try {
-//       const formData = new FormData();
-//       Object.entries(data).forEach(([key, value]) => {
-//         if (key === "image") {
-//           formData.append("image", value[0]);
-//         } else {
-//           formData.append(key, value);
-//         }
-//       });
-
-//       const res = await axios.post(`${process.env.NEXT_PUBLIC_API_BASE}/vendoraddproduct`, formData, {
-//         headers: { 
-//             "Content-Type": "multipart/form-data", 
-//             Authorization: `Bearer ${token}`
-//         },
-//       });
-
-//       toast({
-//         title: "✅ Product Submitted",
-//         description: "Waiting for admin approval.",
-//       });
-
-//       form.reset();
-//       setPreview(null);
-//     } catch (err) {
-//       toast({
-//         title: "❌ Error",
-//         description: err.response?.data?.message || "Failed to submit product",
-//       });
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-//   return (
-//     <motion.div
-//       className="max-w-3xl mx-auto p-6"
-//       initial={{ opacity: 0, y: 40 }}
-//       animate={{ opacity: 1, y: 0 }}
-//     >
-//       <Card className="shadow-2xl border-t-4 border-indigo-500 rounded-2xl">
-//         <CardHeader>
-//           <CardTitle className="text-3xl font-bold text-indigo-700">
-//             🛍️ Add New Product
-//           </CardTitle>
-//         </CardHeader>
-
-//         <CardContent>
-//           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-//             {/* Floating Inputs */}
-//             {[
-//               { name: "name", label: "Product Name" },
-//               { name: "description", label: "Description", textarea: true },
-//             ].map(({ name, label, textarea }) => (
-//               <div key={name} className="relative">
-//                 {textarea ? (
-//                   <Textarea
-//                     placeholder=" "
-//                     rows={4}
-//                     {...form.register(name)}
-//                     className="peer"
-//                   />
-//                 ) : (
-//                   <Input placeholder=" " {...form.register(name)} className="peer" />
-//                 )}
-//                 <Label className="absolute left-2 bg-white px-1 top-[-10px] text-sm text-gray-500 transition-all peer-placeholder-shown:top-3 peer-placeholder-shown:text-gray-400 peer-placeholder-shown:text-base">
-//                   {label}
-//                 </Label>
-//                 {form.formState.errors[name] && (
-//                   <p className="text-red-500 text-xs mt-1">
-//                     {form.formState.errors[name].message}
-//                   </p>
-//                 )}
-//               </div>
-//             ))}
-
-//             {/* Price Fields */}
-//             <div className="grid grid-cols-3 gap-4">
-//               {[
-//                 { name: "price", label: "Price (৳)" },
-//                 { name: "costPrice", label: "Cost Price (৳)" },
-//                 { name: "discount", label: "Discount (%)" },
-//               ].map(({ name, label }) => (
-//                 <div key={name}>
-//                   <Label>{label}</Label>
-//                   <Input type="number" {...form.register(name)} />
-//                   {form.formState.errors[name] && (
-//                     <p className="text-red-500 text-xs">
-//                       {form.formState.errors[name].message}
-//                     </p>
-//                   )}
+//         {/* CATEGORY SEARCH */}
+//         <div className="relative mt-6" ref={catBox}>
+//           <input
+//             className="input"
+//             placeholder={form.category ? form.category.name : "Search Category"}
+//             value={catQuery}
+//             onChange={e => setCatQuery(e.target.value)}
+//           />
+//           {catResults.length > 0 && (
+//             <div className="absolute z-20 w-full bg-gray-800 rounded-xl mt-2 max-h-56 overflow-auto">
+//               {catResults.map(c => (
+//                 <div
+//                   key={c._id}
+//                   onClick={() => {
+//                     setForm({ ...form, category: c });
+//                     setCatQuery("");
+//                     setCatResults([]);
+//                   }}
+//                   className="px-4 py-2 hover:bg-indigo-600 cursor-pointer"
+//                 >
+//                   {c.name}
 //                 </div>
 //               ))}
 //             </div>
+//           )}
+//         </div>
 
-//             {/* Category */}
-//             <div>
-//               <Label>Category</Label>
-//               <Select onValueChange={(val) => form.setValue("category", val)}>
-//                 <SelectTrigger>
-//                   <SelectValue placeholder="Select category" />
-//                 </SelectTrigger>
-//                 <SelectContent>
-//                   {categories.map((cat) => (
-//                     <SelectItem key={cat._id} value={cat._id}>
-//                       {cat.name}
-//                     </SelectItem>
-//                   ))}
-//                 </SelectContent>
-//               </Select>
-//               {form.formState.errors.category && (
-//                 <p className="text-red-500 text-xs mt-1">
-//                   {form.formState.errors.category.message}
-//                 </p>
-//               )}
+//         {/* BRAND SEARCH */}
+//         <div className="relative mt-6" ref={brandBox}>
+//           <input
+//             className="input"
+//             placeholder={form.brand ? form.brand.name : "Search Brand"}
+//             value={brandQuery}
+//             onChange={e => setBrandQuery(e.target.value)}
+//           />
+//           {brandResults.length > 0 && (
+//             <div className="absolute z-20 w-full bg-gray-800 rounded-xl mt-2 max-h-56 overflow-auto">
+//               {brandResults.map(b => (
+//                 <div
+//                   key={b._id}
+//                   onClick={() => {
+//                     setForm({ ...form, brand: b });
+//                     setBrandQuery("");
+//                     setBrandResults([]);
+//                   }}
+//                   className="px-4 py-2 hover:bg-indigo-600 cursor-pointer"
+//                 >
+//                   {b.name}
+//                 </div>
+//               ))}
 //             </div>
+//           )}
+//         </div>
 
-//             {/* Brand */}
-//             <div>
-//               <Label>Brand</Label>
-//               <Select onValueChange={(val) => form.setValue("brand", val)}>
-//                 <SelectTrigger>
-//                   <SelectValue placeholder="Select brand" />
-//                 </SelectTrigger>
-//                 <SelectContent>
-//                   {brands.map((b) => (
-//                     <SelectItem key={b._id} value={b._id}>
-//                       {b.name}
-//                     </SelectItem>
-//                   ))}
-//                 </SelectContent>
-//               </Select>
-//               {form.formState.errors.brand && (
-//                 <p className="text-red-500 text-xs mt-1">
-//                   {form.formState.errors.brand.message}
-//                 </p>
-//               )}
-//             </div>
+//         {/* IMAGE */}
+//         <input type="file" className="mt-6" onChange={e => setImage(e.target.files[0])} />
 
-//             {/* Stock */}
-//             <div>
-//               <Label>Stock Quantity</Label>
-//               <Input type="number" {...form.register("stock")} />
-//               {form.formState.errors.stock && (
-//                 <p className="text-red-500 text-xs mt-1">
-//                   {form.formState.errors.stock.message}
-//                 </p>
-//               )}
-//             </div>
+//         <button
+//           disabled={loading}
+//           onClick={submit}
+//           className="mt-8 w-full bg-indigo-600 hover:bg-indigo-700 py-3 rounded-xl font-semibold"
+//         >
+//           {loading ? "Submitting..." : "Submit Product"}
+//         </button>
+//       </div>
 
-//             {/* Image Upload */}
-//             <div>
-//               <Label>Product Image</Label>
-//               <Input type="file" accept="image/*" onChange={handleImageChange} />
-//               {preview && (
-//                 <Image
-//                   src={preview}
-//                   alt="preview"
-//                   width={400} 
-//                   height={300}
-//                   className="w-32 h-32 object-cover mt-3 rounded-lg border"
-//                 />
-//               )}
-//               {form.formState.errors.image && (
-//                 <p className="text-red-500 text-xs mt-1">
-//                   {form.formState.errors.image.message}
-//                 </p>
-//               )}
-//             </div>
-
-//             {/* Submit Button */}
-//             <Button
-//               type="submit"
-//               disabled={loading}
-//               className="w-full mt-6 bg-indigo-600 hover:bg-indigo-700"
-//             >
-//               {loading ? "Submitting..." : "Submit Product"}
-//             </Button>
-//           </form>
-//         </CardContent>
-//       </Card>
-//     </motion.div>
+//       {/* Tailwind helper */}
+//       <style jsx>{`
+//         .input {
+//           width: 100%;
+//           padding: 12px 14px;
+//           border-radius: 14px;
+//           background: #111827;
+//           border: 1px solid #1f2937;
+//         }
+//         .input:focus {
+//           outline: none;
+//           border-color: #6366f1;
+//         }
+//       `}</style>
+//     </div>
 //   );
 // }
-
-
-
 
 
 
@@ -525,253 +189,247 @@
 
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
-import { motion } from "framer-motion";
 import Image from "next/image";
-import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
-import * as z from "zod";
-
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/components/ui/use-toast";
-
-// ✅ Validation Schema
-const formSchema = z.object({
-  name: z.string().min(3, "Name must be at least 3 characters"),
-  description: z.string().min(10, "Description must be at least 10 characters"),
-  price: z.number().min(0, "Price cannot be negative"),
-  costPrice: z.number().min(0, "Cost price cannot be negative"),
-  discount: z.number().min(0).max(100),
-  category: z.string().min(1, "Category is required"),
-  brand: z.string().min(1, "Brand is required"),
-  stock: z.number().min(1, "Stock is required"),
-  image: z.any().refine((files) => files?.length > 0, "Image is required"),
-});
+import { useEffect, useRef, useState } from "react";
 
 export default function VendorAddProductPage() {
-  const { toast } = useToast();
-  const [categories, setCategories] = useState([]);
-  const [brands, setBrands] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [preview, setPreview] = useState(null);
-
-  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
-
-  const form = useForm({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      name: "",
-      description: "",
-      price: 0,
-      costPrice: 0,
-      discount: 0,
-      category: "",
-      brand: "",
-      stock: 0,
-      image: null,
-    },
+  const [form, setForm] = useState({
+    name: "",
+    description: "",
+    price: "",
+    costPrice: "",
+    discount: 0,
+    stock: "",
+    category: null,
+    brand: null,
   });
 
-  // 🔄 Fetch Categories & Brands
-  useEffect(() => {
-    const fetchData = async () => {
-      if (!token) return console.error("⚠️ No token found.");
-      try {
-        const [catRes, brandRes] = await Promise.all([
-          axios.get(`${process.env.NEXT_PUBLIC_API_BASE}/allcategories`, {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
-          axios.get(`${process.env.NEXT_PUBLIC_API_BASE}/allbrands`, {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
-        ]);
-        setCategories(catRes.data?.categories || catRes.data?.data || []);
-        setBrands(brandRes.data?.brands || brandRes.data?.data || []);
-      } catch (err) {
-        console.error("❌ Fetch error:", err);
-      }
-    };
-    fetchData();
-  }, [token]);
+  const API_BASE = process.env.NEXT_PUBLIC_API_BASE;
+  const token = typeof window !== "undefined" ? localStorage.getItem("token") : "";
 
-  // 🖼️ Image Preview
-  const handleImageChange = (e) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      form.setValue("image", e.target.files, { shouldValidate: true });
-      setPreview(URL.createObjectURL(file));
+  const [image, setImage] = useState(null);
+  const [preview, setPreview] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  // ✅ validation & toast
+  const [errors, setErrors] = useState({});
+  const [toast, setToast] = useState(null);
+
+  // 🔍 Search states
+  const [catQuery, setCatQuery] = useState("");
+  const [brandQuery, setBrandQuery] = useState("");
+  const [catResults, setCatResults] = useState([]);
+  const [brandResults, setBrandResults] = useState([]);
+
+  const catBox = useRef(null);
+  const brandBox = useRef(null);
+
+  // 🔍 Category search (NO preload)
+  useEffect(() => {
+    if (!catQuery.trim()) {
+      setCatResults([]);
+      return;
     }
+    const t = setTimeout(async () => {
+      const res = await axios.get(`${API_BASE}/allcategories?q=${catQuery}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setCatResults(res.data.categories || []);
+    }, 300);
+    return () => clearTimeout(t);
+  }, [API_BASE, catQuery, token]);
+
+  // 🔍 Brand search (NO preload)
+  useEffect(() => {
+    if (!brandQuery.trim()) {
+      setBrandResults([]);
+      return;
+    }
+    const t = setTimeout(async () => {
+      const res = await axios.get(`${API_BASE}/allbrands?q=${brandQuery}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setBrandResults(res.data.brands || []);
+    }, 300);
+    return () => clearTimeout(t);
+  }, [API_BASE, brandQuery, token]);
+
+  // 🧠 Field validation
+  const validate = () => {
+    const e = {};
+    if (!form.name.trim()) e.name = "Product name is required";
+    if (!form.price) e.price = "Price is required";
+    if (!form.costPrice) e.costPrice = "Cost price is required";
+    if (!form.stock) e.stock = "Stock is required";
+    if (!form.description || form.description.length < 10) e.description = "Description minimum 10 characters";
+    if (!form.category) e.category = "Category is required";
+    if (!form.brand) e.brand = "Brand is required";
+    if (!image) e.image = "Product image is required";
+    setErrors(e);
+    return Object.keys(e).length === 0;
   };
 
-  // 🚀 Submit Handler
-  const onSubmit = async (data) => {
-    if (!token) return toast({ title: "❌ Error", description: "User not authenticated." });
+  const submit = async () => {
+    if (!validate()) {
+      setToast({ type: "error", msg: "Please fix validation errors" });
+      return;
+    }
 
     setLoading(true);
     try {
-      const formData = new FormData();
-      Object.entries(data).forEach(([key, value]) => {
-        if (key === "image") formData.append("image", value[0]);
-        else formData.append(key, value);
+      const fd = new FormData();
+      Object.entries(form).forEach(([k, v]) => {
+        if (v && typeof v === "object") fd.append(k, v._id);
+        else fd.append(k, v);
       });
+      fd.append("image", image);
 
-      await axios.post(`${process.env.NEXT_PUBLIC_API_BASE}/vendoraddproduct`, formData, {
+      await axios.post(`${API_BASE}/vendoraddproduct`, fd, {
         headers: {
-          "Content-Type": "multipart/form-data",
           Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
         },
       });
 
-      toast({
-        title: "✅ Product Submitted",
-        description: "Waiting for admin approval.",
-      });
-
-      form.reset();
+      setToast({ type: "success", msg: "Product submitted for admin approval" });
+      setForm({ name: "", description: "", price: "", costPrice: "", discount: 0, stock: "", category: null, brand: null });
+      setImage(null);
       setPreview(null);
+      setErrors({});
     } catch (err) {
-      toast({
-        title: "❌ Error",
-        description: err.response?.data?.message || "Failed to submit product.",
-      });
+      setToast({ type: "error", msg: err.response?.data?.message || "Submission failed" });
     } finally {
       setLoading(false);
+      setTimeout(() => setToast(null), 3000);
     }
   };
 
   return (
-    <motion.div
-      className="max-w-3xl mx-auto p-6"
-      initial={{ opacity: 0, y: 30 }}
-      animate={{ opacity: 1, y: 0 }}
-    >
-      <Card className="shadow-2xl border-t-4 border-indigo-600 rounded-2xl">
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold text-indigo-700">
-            🛍️ Add New Product
-          </CardTitle>
-        </CardHeader>
+    <div className="min-h-screen bg-gray-50 px-4 py-6 md:p-10">
+      {/* 🔔 Toast */}
+      {toast && (
+        <div className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-xl shadow-lg text-white ${toast.type === "success" ? "bg-green-600" : "bg-red-600"}`}>
+          {toast.msg}
+        </div>
+      )}
 
-        <CardContent>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
-            {/* Floating Input Fields */}
-            <div className="relative">
-              <Input placeholder=" " {...form.register("name")} className="peer" />
-              <Label className="floating-label">Product Name</Label>
-              {form.formState.errors.name && (
-                <p className="text-red-500 text-sm">{form.formState.errors.name.message}</p>
-              )}
+      <div className="max-w-5xl mx-auto bg-white rounded-2xl shadow-xl p-6 md:p-10">
+        <h1 className="text-2xl md:text-3xl font-bold mb-8 text-gray-800">➕ Add New Product</h1>
+
+        {/* BASIC INFO */}
+        <div className="grid md:grid-cols-2 gap-4">
+          <div>
+            <input className="input" placeholder="Product Name" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
+            {errors.name && <p className="err">{errors.name}</p>}
+          </div>
+          <div>
+            <input className="input" type="number" placeholder="Price" value={form.price} onChange={e => setForm({ ...form, price: e.target.value })} />
+            {errors.price && <p className="err">{errors.price}</p>}
+          </div>
+          <div>
+            <input className="input" type="number" placeholder="Cost Price" value={form.costPrice} onChange={e => setForm({ ...form, costPrice: e.target.value })} />
+            {errors.costPrice && <p className="err">{errors.costPrice}</p>}
+          </div>
+          <div>
+            <input className="input" type="number" placeholder="Stock" value={form.stock} onChange={e => setForm({ ...form, stock: e.target.value })} />
+            {errors.stock && <p className="err">{errors.stock}</p>}
+          </div>
+        </div>
+
+        <div className="mt-4">
+          <textarea className="input h-28" placeholder="Product Description" value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} />
+          {errors.description && <p className="err">{errors.description}</p>}
+        </div>
+
+        {/* CATEGORY */}
+        <div className="relative mt-4">
+          <input className="input" placeholder={form.category ? form.category.name : "Search Category"} value={catQuery} onChange={e => setCatQuery(e.target.value)} />
+          {errors.category && <p className="err">{errors.category}</p>}
+          {catResults.length > 0 && (
+            <div className="absolute z-20 w-full bg-white border rounded-xl mt-1 max-h-52 overflow-auto">
+              {catResults.map(c => (
+                <div key={c._id} onClick={() => { setForm({ ...form, category: c }); setCatQuery(""); setCatResults([]); }} className="option">{c.name}</div>
+              ))}
             </div>
+          )}
+        </div>
 
-            <div className="relative">
-              <Textarea placeholder=" " {...form.register("description")} rows={4} className="peer" />
-              <Label className="floating-label">Description</Label>
-              {form.formState.errors.description && (
-                <p className="text-red-500 text-sm">{form.formState.errors.description.message}</p>
-              )}
+        {/* BRAND */}
+        <div className="relative mt-4">
+          <input className="input" placeholder={form.brand ? form.brand.name : "Search Brand"} value={brandQuery} onChange={e => setBrandQuery(e.target.value)} />
+          {errors.brand && <p className="err">{errors.brand}</p>}
+          {brandResults.length > 0 && (
+            <div className="absolute z-20 w-full bg-white border rounded-xl mt-1 max-h-52 overflow-auto">
+              {brandResults.map(b => (
+                <div key={b._id} onClick={() => { setForm({ ...form, brand: b }); setBrandQuery(""); setBrandResults([]); }} className="option">{b.name}</div>
+              ))}
             </div>
+          )}
+        </div>
 
-            {/* Price Section */}
-            <div className="grid grid-cols-3 gap-4">
-              <div className="relative">
-                <Input type="number" {...form.register("price", { valueAsNumber: true })} className="peer" />
-                <Label className="floating-label">Price</Label>
+        {/* IMAGE */}
+        {/* <div className="mt-4">
+          <label className="block text-sm font-medium mb-1">Product Image</label>
+          <div className="flex items-center gap-4 flex-wrap">
+            <label className="btn">
+              Choose Image
+              <input type="file" hidden accept="image/*" onChange={e => { const f = e.target.files[0]; setImage(f); setPreview(URL.createObjectURL(f)); }} />
+            </label>
+            <div className="w-20 w-20 object-cover rounded-xl border">
+              {preview && <Image src={preview} alt="Product Image" fill />}
+            </div>
+          </div>
+          {errors.image && <p className="err">{errors.image}</p>}
+        </div> */}
+        <div className="mt-4">
+          <label className="block text-sm font-medium mb-1">Product Image</label>
+
+          <div className="flex items-center gap-4 flex-wrap">
+            <label className="btn">
+              Choose Image
+              <input
+                type="file"
+                hidden
+                accept="image/*"
+                onChange={(e) => {
+                  const file = e.target.files[0];
+                  if (!file) return;
+                  setImage(file);
+                  setPreview(URL.createObjectURL(file));
+                }}
+              />
+            </label>
+
+            {preview && (
+              <div className="relative h-30 w-30 rounded-xl border overflow-hidden">
+                <Image
+                  src={preview}
+                  alt="Product Preview"
+                  className="h-full w-full object-cover"
+                  fill
+                />
               </div>
+            )}
+          </div>
 
-              <div className="relative">
-                <Input type="number" {...form.register("costPrice", { valueAsNumber: true })} className="peer" />
-                <Label className="floating-label">Cost Price</Label>
-              </div>
+          {errors.image && <p className="err">{errors.image}</p>}
+        </div>
 
-              <div className="relative">
-                <Input type="number" {...form.register("discount", { valueAsNumber: true })} className="peer" />
-                <Label className="floating-label">Discount (%)</Label>
-              </div>
-            </div>
 
-            {/* Category */}
-            <div>
-              <Label>Category</Label>
-              <Select onValueChange={(val) => form.setValue("category", val, { shouldValidate: true })}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select category" />
-                </SelectTrigger>
-                <SelectContent>
-                  {categories.map((cat) => (
-                    <SelectItem key={cat._id} value={cat._id}>{cat.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {form.formState.errors.category && (
-                <p className="text-red-500 text-sm">{form.formState.errors.category.message}</p>
-              )}
-            </div>
+        <button disabled={loading} onClick={submit} className="mt-8 w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-xl font-semibold">
+          {loading ? "Submitting..." : "Submit Product"}
+        </button>
+      </div>
 
-            {/* Brand */}
-            <div>
-              <Label>Brand</Label>
-              <Select onValueChange={(val) => form.setValue("brand", val, { shouldValidate: true })}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select brand" />
-                </SelectTrigger>
-                <SelectContent>
-                  {brands.map((b) => (
-                    <SelectItem key={b._id} value={b._id}>{b.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {form.formState.errors.brand && (
-                <p className="text-red-500 text-sm">{form.formState.errors.brand.message}</p>
-              )}
-            </div>
-
-            {/* Stock */}
-            <div className="relative">
-              <Input type="number" {...form.register("stock", { valueAsNumber: true })} className="peer" />
-              <Label className="floating-label">Stock Quantity</Label>
-            </div>
-
-            {/* Image Upload + Preview */}
-            <div>
-              <Label>Product Image</Label>
-              <Input type="file" accept="image/*" onChange={handleImageChange} />
-              {preview && (
-                <Image src={preview} width={400} height={300} alt="Preview" className="mt-3 w-40 h-40 object-cover rounded-lg shadow-md" />
-              )}
-            </div>
-
-            {/* Submit */}
-            <Button type="submit" disabled={loading} className="w-full mt-4 bg-indigo-600 hover:bg-indigo-700">
-              {loading ? "Submitting..." : "Submit Product"}
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
-
-      {/* Floating Label CSS */}
       <style jsx>{`
-        .floating-label {
-          position: absolute;
-          top: -10px;
-          left: 10px;
-          background: white;
-          padding: 0 4px;
-          color: #6b7280;
-          font-size: 0.875rem;
-          transition: all 0.2s ease;
-        }
-        .peer::placeholder-shown + .floating-label {
-          top: 10px;
-          font-size: 1rem;
-          color: #9ca3af;
-        }
+        .input { width: 100%; padding: 12px 14px; border-radius: 14px; border: 1px solid #e5e7eb; }
+        .input:focus { outline: none; border-color: #6366f1; }
+        .err { color: #dc2626; font-size: 12px; margin-top: 4px; }
+        .option { padding: 8px 12px; cursor: pointer; }
+        .option:hover { background: #eef2ff; }
+        .btn { background: #4f46e5; color: white; padding: 8px 14px; border-radius: 12px; cursor: pointer; }
       `}</style>
-    </motion.div>
+    </div>
   );
 }
