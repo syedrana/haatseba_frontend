@@ -89,6 +89,7 @@ export default function DashboardLayout({ children }) {
       children: [
         { name: 'Create Package', href: "/admin/dashboard/agent/create-package" },
         { name: 'All Package', href: "/admin/dashboard/agent/all-package" },
+        { name: 'Orders', href: "/admin/dashboard/agent/orders" },
       ]
     },
     { 

@@ -270,7 +270,7 @@ useEffect(() => {
         )}
       </div>
 
-{/* Referral Link Section */}
+            {/* Referral Link Section */}
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -303,85 +303,7 @@ useEffect(() => {
 
 
       {/* ✅ BONUS PLAN SECTION */}
-<section className="mt-10">
-  <h3 className="text-base md:text-lg font-semibold text-gray-900 dark:text-white mb-2">
-    Bonus Plan
-  </h3>
-  <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
-    According to the bonus structure below, you can see how much bonus you will receive at each level and whether you have achieved it or not.
-  </p>
 
-  <div className="rounded-2xl border border-gray-100 dark:border-gray-700 bg-white/60 dark:bg-gray-800/60 backdrop-blur shadow-sm">
-    {/* Table Header (Desktop) */}
-    <div className="hidden md:grid grid-cols-4 gap-4 p-4 text-sm font-medium text-gray-500 dark:text-gray-400 border-b border-gray-100 dark:border-gray-700">
-      <div>Level</div>
-      <div>Bonus Reward</div>
-      <div>Condition</div>
-      <div>Status</div>
-    </div>
-
-    {/* Table Body */}
-    <div className="divide-y divide-gray-100 dark:divide-gray-700">
-      {bonusAmounts.map((plan) => {
-         const { level, bonusAmount, rewardType, condition } = plan;
-        const achieved = data?.bonusHistory?.some(b => b.level == level);
-
-        const isNumber = !isNaN(Number(bonusAmount));
-        const bonusText =
-          rewardType === "cash"
-            ? (isNumber ? `BDT ${Number(bonusAmount).toLocaleString()}` : `BDT ${bonusAmount}`)
-            : rewardType === "product"
-            ? `🎁 ${bonusAmount}`
-            : `${bonusAmount}`;
-
-          return (
-            <div
-              key={level}
-              className="md:grid md:grid-cols-4 gap-4 p-4 text-sm flex flex-col"
-            >
-              {/* Desktop View */}
-              <div className="hidden md:block font-medium text-gray-800 dark:text-gray-100">
-                Level {level}
-              </div>
-              <div className="hidden md:block text-gray-700 dark:text-gray-200">
-                {bonusText}
-              </div>
-              <div className="hidden md:block text-gray-500 dark:text-gray-400">
-                {condition}
-              </div>
-              <div className="hidden md:block">
-                {achieved ? (
-                  <span className="bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400 px-2 py-1 rounded-full text-xs">
-                    ✅ Achieved
-                  </span>
-                ) : (
-                  <span className="bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-400 px-2 py-1 rounded-full text-xs">
-                    ❌ Not Achieved
-                  </span>
-                )}
-              </div>
-
-              {/* Mobile Card View */}
-              <div className="flex flex-col md:hidden bg-white/80 dark:bg-gray-900/40 rounded-xl border border-gray-100 dark:border-gray-700 p-3 mb-3 shadow-sm">
-                <div className="flex justify-between text-sm font-semibold text-gray-800 dark:text-gray-100">
-                  <span>Level {level}</span>
-                  <span>{bonusText}</span>
-                </div>
-                <div className="flex justify-between mt-2 text-xs text-gray-500 dark:text-gray-400">
-                  <span>{condition}</span>
-                  {achieved ? (
-                    <span className="text-emerald-500">✅ Achieved</span>
-                  ) : (
-                    <span className="text-red-500">❌ Not Achieved</span>
-                  )}
-                </div>
-              </div>
-            </div>
-          );
-        })}
-    </div>
-  </div>
-</section>
 
 
 

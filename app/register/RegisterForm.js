@@ -1,3 +1,711 @@
+// "use client";
+
+// import axios from "axios";
+// import Image from "next/image";
+// import { useSearchParams } from "next/navigation";
+// import { useEffect, useRef, useState } from "react";
+
+// // ---------- Helpers ----------
+// const bdPhoneOk = (v) => /^01[3-9]\d{8}$/.test(v || "");
+// const passStrong = (pw) => {
+//   if (!pw) return 0;
+//   let s = 0;
+//   if (pw.length >= 8) s++;
+//   if (/[A-Z]/.test(pw)) s++;
+//   if (/[0-9]/.test(pw)) s++;
+//   if (/[^A-Za-z0-9]/.test(pw)) s++;
+//   return s;
+// };
+
+// // ---------- Floating Input Component ----------
+// const FloatingInput = ({
+//   label,
+//   type = "text",
+//   name,
+//   value,
+//   onChange,
+//   toggleType,
+//   error,
+//   autoComplete,
+//   readOnly = false,
+// }) => (
+//   <div className="relative w-full">
+//     <input
+//       type={toggleType || type}
+//       id={name}
+//       name={name}
+//       value={value}
+//       onChange={onChange}
+//       placeholder=" "
+//       autoComplete={autoComplete}
+//       className={`peer block w-full rounded-xl border px-3 pt-5 pb-2 text-sm bg-transparent h-14 focus:outline-none focus:ring-2
+//       ${error ? "border-red-500 focus:ring-red-200" : "border-gray-300 focus:border-indigo-500 focus:ring-indigo-200"}
+//       ${readOnly ? "bg-gray-100 cursor-not-allowed" : ""}`}
+//     />
+//     <label
+//       htmlFor={name}
+//       className="absolute left-3 top-0 -translate-y-1/2 bg-white px-1 text-gray-500 text-sm transition-all
+//       peer-placeholder-shown:top-1/2 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-placeholder-shown:-translate-y-1/2
+//       peer-focus:top-0 peer-focus:-translate-y-1/2 peer-focus:text-sm peer-focus:text-indigo-600"
+//     >
+//       {label}
+//     </label>
+//     {error && <p className="mt-1 text-xs text-red-500">{error}</p>}
+//   </div>
+// );
+
+// const FloatingSelect = ({ label, name, value, onChange, options, error }) => (
+//   <div className="relative w-full">
+//     <select
+//       id={name}
+//       name={name}
+//       value={value}
+//       onChange={onChange}
+//       className={`peer block w-full rounded-xl border px-3 pt-5 pb-2 text-sm bg-white h-14 focus:outline-none focus:ring-2
+//         ${error ? "border-red-500 focus:ring-red-200" : "border-gray-300 focus:border-indigo-500 focus:ring-indigo-200"}`}
+//     >
+//       <option value="" disabled hidden></option>
+//       {options.map((opt) => (
+//         <option key={opt.value} value={opt.value}>
+//           {opt.label}
+//         </option>
+//       ))}
+//     </select>
+
+//     {/* floating label */}
+//     <label
+//       htmlFor={name}
+//       className={`absolute left-3 text-gray-500 text-sm transition-all bg-white px-1
+//         ${!value ? "top-1/2 -translate-y-1/2 text-gray-400 text-sm" : "top-0 -translate-y-1/2 text-indigo-600 text-xs"}
+//         peer-focus:top-0 peer-focus:-translate-y-1/2 peer-focus:text-xs peer-focus:text-indigo-600`}
+//     >
+//       {label}
+//     </label>
+
+//     {error && <p className="mt-1 text-xs text-red-500">{error}</p>}
+//   </div>
+// );
+
+// // ---------- Registration Page ----------
+// export default function RegisterForm() {
+
+//   const searchParams = useSearchParams(); 
+//   const refCode = searchParams.get("ref");
+
+//   const [form, setForm] = useState({
+//     firstName: "",
+//     lastName: "",
+//     email: "",
+//     phone: "",
+//     password: "",
+//     confirmPassword: "",
+//     address: "",
+//     referralCode: "",
+//     nomineeFirstName: "",
+//     nomineeLastName: "",
+//     nomineeRelation: "",
+//     nomineePhone: "",
+//     nomineeAddress: "",
+//     placementPosition: "",
+//     depositTransactionId: "", 
+//     registrationType: "deposit",
+//     productIds: [],
+//   });
+//   const [showPw, setShowPw] = useState(false);
+//   const [showCPw, setShowCPw] = useState(false);
+//   const [imgFile, setImgFile] = useState(null);
+//   const [preview, setPreview] = useState(null);
+//   const [errors, setErrors] = useState({});
+//   const [submitting, setSubmitting] = useState(false);
+//   const dropRef = useRef(null);
+//   const [products, setProducts] = useState([]);
+
+//   useEffect(() => {
+//     const loadProducts = async () => {
+//       try {
+//         const res = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE}/registerproduct`,
+//           {
+//             headers: {
+//               Authorization: process.env.NEXT_PUBLIC_API_KEY,
+//             },
+//           }
+//         );
+
+//         setProducts(res.data.products || []);
+//       } catch (err) {
+//         console.error("Product load error:", err);
+//       }
+//     };
+
+//     loadProducts();
+//   }, []);
+
+//   useEffect(() => {
+//     if (refCode) {
+//       setForm((prev) => ({ ...prev, referralCode: refCode }));
+//     }
+//   }, [refCode]);
+
+//   const onChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+
+//   // ---------- Image Handlers ----------
+//   const onPickImage = async (file) => {
+//     if (!file) return;
+//     if (!/^image\/(png|jpe?g|webp)$/i.test(file.type)) {
+//       setErrors((p) => ({ ...p, image: "Only JPG, PNG or WEBP allowed" }));
+//       return;
+//     }
+//     if (file.size > 2 * 1024 * 1024) {
+//       setErrors((p) => ({ ...p, image: "Max 2MB image allowed" }));
+//       return;
+//     }
+//     setErrors((p) => ({ ...p, image: null }));
+//     setImgFile(file);
+//     setPreview(URL.createObjectURL(file));
+//   };
+//   const onDrop = (e) => {
+//     e.preventDefault();
+//     onPickImage(e.dataTransfer.files?.[0]);
+//   };
+
+//   // ---------- Validation ----------
+//   const validate = () => {
+//     const e = {};
+//     if (!form.firstName.trim()) e.firstName = "First name is required";
+//     if (!form.lastName.trim()) e.lastName = "Last name is required";
+//     if (!form.email || !/^\S+@\S+\.\S+$/.test(form.email))
+//       e.email = "Valid email is required";
+//     if (!bdPhoneOk(form.phone))
+//       e.phone = "Valid Bangladeshi phone (01[3-9]XXXXXXXX)";
+//     if (!form.password) e.password = "Password is required";
+//     if (
+//       form.password.length < 8 ||
+//       form.password.length > 16 ||
+//       !/[A-Z]/.test(form.password) ||
+//       !/[0-9]/.test(form.password) ||
+//       !/[^A-Za-z0-9]/.test(form.password) ||
+//       /^\s|\s$/.test(form.password)
+//     )
+//       e.password =
+//         "8–16 chars, 1 uppercase, 1 number, 1 symbol; no leading/trailing space";
+//     if (form.confirmPassword !== form.password)
+//       e.confirmPassword = "Passwords do not match";
+//     if (!form.address.trim() || form.address.trim().length < 5)
+//       e.address = "Address must be at least 5 chars";
+//     if (!form.nomineeFirstName.trim()) e.nomineeFirstName = "Required";
+//     if (!form.nomineeLastName.trim()) e.nomineeLastName = "Required";
+//     if (!form.nomineeRelation.trim()) e.nomineeRelation = "Required";
+//     if (!bdPhoneOk(form.nomineePhone))
+//       e.nomineePhone = "Valid nominee phone required";
+//     if (!form.nomineeAddress.trim())
+//       e.nomineeAddress = "Nominee address is required";
+//     if (!form.placementPosition)
+//       e.placementPosition = "Placement position is required";
+//     if (form.registrationType === "deposit" && !form.depositTransactionId.trim())
+//       e.depositTransactionId = "Transaction ID is required";
+//     if (form.registrationType === "product" && form.productIds.length === 0) {
+//       e.productIds = "Select at least one product";
+//     } 
+//     if (!form.referralCode.trim())
+//       e.referralCode = "Referred code is required";
+//     if (!imgFile) e.image = "User image is required";
+//     return e;
+//   };
+
+//   // ---------- Submit ----------
+//   const onSubmit = async (e) => {
+//     e.preventDefault();
+//     const eMap = validate();
+//     if (Object.keys(eMap).length) {
+//       setErrors(eMap);
+//       return;
+//     }
+//     setErrors({});
+//     setSubmitting(true);
+
+//     try {
+//       const formData = new FormData();
+//       Object.entries(form).forEach(([key, val]) => {
+//         if (
+//           ![
+//             "nomineeFirstName",
+//             "nomineeLastName",
+//             "nomineeRelation",
+//             "nomineePhone",
+//             "nomineeAddress",
+//           ].includes(key)
+//         ) {
+//           formData.append(key, val.trim());
+//         }
+//       });
+
+//       formData.append("nominee", JSON.stringify({
+//         firstName: form.nomineeFirstName.trim(),
+//         lastName: form.nomineeLastName.trim(),
+//         relation: form.nomineeRelation.trim(),
+//         phone: form.nomineePhone.trim(),
+//         address: form.nomineeAddress.trim(),
+//       }));
+
+
+//       if (imgFile) formData.append("image", imgFile);
+
+//       const res = await axios.post(
+//         `${process.env.NEXT_PUBLIC_API_BASE}/registration`,
+//         formData,
+//         {
+//           headers: {
+//             Authorization: process.env.NEXT_PUBLIC_API_KEY,
+//           },
+//           timeout: 90000,
+//         }
+//       );
+
+//       localStorage.setItem("pendingEmail", form.email);
+
+//       alert(res.data.message);
+
+//       // Reset form
+//       setForm({
+//         firstName: "",
+//         lastName: "",
+//         email: "",
+//         phone: "",
+//         password: "",
+//         confirmPassword: "",
+//         address: "",
+//         referralCode: "",
+//         nomineeFirstName: "",
+//         nomineeLastName: "",
+//         nomineeRelation: "",
+//         nomineePhone: "",
+//         nomineeAddress: "",
+//         placementPosition: "",
+//         depositTransactionId: "",
+//         registrationType: "",
+//         productIds: "",
+//       });
+//       setImgFile(null);
+//       setPreview(null);
+//     } catch (err) {
+//       console.error(err);
+//       setErrors({ submit: err.response?.data?.message || "Network error" });
+//     } finally {
+//       setSubmitting(false);
+//     }
+//   };
+
+//   const strength = passStrong(form.password);
+//   const strengthBar =
+//     ["bg-red-500", "bg-orange-500", "bg-yellow-400", "bg-green-500"][
+//       strength - 1
+//     ] || "bg-gray-200";
+
+//   // ---------- UI ----------
+//   return (
+//     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-950 flex items-center justify-center p-6 pt-20">
+//       <form
+//         onSubmit={onSubmit}
+//         className="w-full max-w-2xl bg-white shadow-lg rounded-2xl p-8 space-y-6"
+//       >
+//         <h2 className="text-2xl font-bold text-gray-800 text-center mb-4">
+//           Create an Account
+//         </h2>
+
+        
+        
+//         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+//           <label>
+//             <input
+//               type="radio"
+//               value="deposit"
+//               checked={form.registrationType === "deposit"}
+//               onChange={(e) => setForm({ ...form, registrationType: e.target.value })}
+//             /> Deposit Registration
+//           </label>
+
+//           <label>
+//             <input
+//               type="radio"
+//               value="product"
+//               checked={form.registrationType === "product"}
+//               onChange={(e) => setForm({ ...form, registrationType: e.target.value })}
+//             /> Product Registration
+//           </label>
+//         </div>
+
+//         {form.registrationType === "deposit" && (
+//           <div>
+//             {/* Payment Info */}
+//             <div className="p-4 mb-6 rounded-lg bg-yellow-50 border border-yellow-300 text-yellow-800 text-sm">
+//               <p>
+//                 Please <strong>Send Money</strong> your registration fee, <strong>BDT 20</strong> to the following official <strong>Personal BKash/Nagad/Rocket</strong> account:
+//               </p>
+//               <p className="text-lg font-semibold mt-1">📱 01304245543</p>
+//               <p className="mt-1 text-gray-600">
+//                 After payment, enter your <strong>Transaction ID</strong> below.
+//               </p>
+//             </div>
+            
+//             {/* Transaction ID */}
+//             <FloatingInput
+//               label="Transaction ID"
+//               name="depositTransactionId"
+//               value={form.depositTransactionId}
+//               onChange={onChange}
+//               error={errors.depositTransactionId}
+//             />
+//           </div>
+//         )}
+
+        
+
+//         {/* {form.registrationType === "product" && (
+//           <div className="space-y-2">
+//             <label className="text-sm font-medium">Select Products</label>
+
+//             <div className="border rounded-xl p-3 h-40 overflow-y-auto">
+//               <select
+//                 multiple
+//                 className="w-full h-full outline-none"
+//                 value={form.productIds}
+//                 onChange={(e) => {
+//                   const values = [...e.target.selectedOptions].map((o) => o.value);
+//                   setForm({ ...form, productIds: values });
+//                 }}
+//               >
+//                 {products.map((p) => (
+//                   <option key={p._id} value={p._id}>
+//                     {p.name}
+//                   </option>
+//                 ))}
+//               </select>
+//             </div>
+
+//             {errors.productIds && (
+//               <p className="text-xs text-red-500">{errors.productIds}</p>
+//             )}
+//           </div>
+//         )} */}
+
+//         {form.registrationType === "product" && (
+//   <div className="space-y-2">
+//     <label className="text-sm font-medium">Select Products</label>
+
+//     {/* Selected Tags */}
+//     <div className="flex flex-wrap gap-2 mb-2">
+//       {form.productIds.map((id) => {
+//         const product = products.find((p) => p._id === id);
+//         if (!product) return null;
+//         return (
+//           <span
+//             key={id}
+//             className="flex items-center bg-indigo-100 text-indigo-700 px-2 py-1 rounded-full text-sm font-medium"
+//           >
+//             {product.name}
+//             <button
+//               type="button"
+//               onClick={() =>
+//                 setForm({
+//                   ...form,
+//                   productIds: form.productIds.filter((pid) => pid !== id),
+//                 })
+//               }
+//               className="ml-1 text-indigo-500 font-bold hover:text-indigo-700 transition"
+//             >
+//               ×
+//             </button>
+//           </span>
+//         );
+//       })}
+//     </div>
+
+//     {/* Product List */}
+//     <div className="border rounded-xl p-3 h-40 overflow-y-auto bg-white shadow-sm">
+//       {products.length === 0 ? (
+//         <p className="text-gray-400 text-sm">No products available</p>
+//       ) : (
+//         products.map((p) => {
+//           const selected = form.productIds.includes(p._id);
+//           return (
+//             <div
+//               key={p._id}
+//               className={`flex items-center justify-between px-3 py-2 mb-1 rounded-lg cursor-pointer transition-all
+//                 ${selected ? "bg-indigo-100 text-indigo-700 font-semibold" : "hover:bg-gray-100"}`}
+//               onClick={() => {
+//                 const newIds = selected
+//                   ? form.productIds.filter((id) => id !== p._id)
+//                   : [...form.productIds, p._id];
+//                 setForm({ ...form, productIds: newIds });
+//               }}
+//             >
+//               <span>{p.name}</span>
+//               {selected && <span className="text-indigo-500 font-bold">✔</span>}
+//             </div>
+//           );
+//         })
+//       )}
+//     </div>
+
+//     {errors.productIds && (
+//       <p className="text-xs text-red-500">{errors.productIds}</p>
+//     )}
+//   </div>
+// )}
+
+
+
+
+        
+
+//         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+//           <FloatingInput
+//             label="First Name"
+//             name="firstName"
+//             value={form.firstName}
+//             onChange={onChange}
+//             error={errors.firstName}
+//             autoComplete="given-name"
+//           />
+//           <FloatingInput
+//             label="Last Name"
+//             name="lastName"
+//             value={form.lastName}
+//             onChange={onChange}
+//             error={errors.lastName}
+//             autoComplete="family-name"
+//           />
+//         </div>
+
+//         <FloatingInput
+//           label="Email"
+//           type="email"
+//           name="email"
+//           value={form.email}
+//           onChange={onChange}
+//           error={errors.email}
+//           autoComplete="email"
+//         />
+//         <FloatingInput
+//           label="Phone (BD)"
+//           type="tel"
+//           name="phone"
+//           value={form.phone}
+//           onChange={onChange}
+//           error={errors.phone}
+//           autoComplete="tel"
+//         />
+
+//         {/* Password */}
+//         <div className="relative">
+//           <FloatingInput
+//             label="Password"
+//             name="password"
+//             value={form.password}
+//             onChange={onChange}
+//             toggleType={showPw ? "text" : "password"}
+//             error={errors.password}
+//             autoComplete="new-password"
+//           />
+//           <button
+//             type="button"
+//             onClick={() => setShowPw(!showPw)}
+//             className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
+//           >
+//             {showPw ? "🙈" : "👁️"}
+//           </button>
+//         </div>
+
+//         <div className="h-2 w-full bg-gray-200 rounded-full">
+//           <div
+//             className={`h-2 rounded-full transition-all ${strengthBar}`}
+//             style={{ width: `${(strength / 4) * 100}%` }}
+//           />
+//         </div>
+
+//         {/* Confirm Password */}
+//         <div className="relative">
+//           <FloatingInput
+//             label="Confirm Password"
+//             name="confirmPassword"
+//             value={form.confirmPassword}
+//             onChange={onChange}
+//             toggleType={showCPw ? "text" : "password"}
+//             error={errors.confirmPassword}
+//             autoComplete="new-password"
+//           />
+//           <button
+//             type="button"
+//             onClick={() => setShowCPw(!showCPw)}
+//             className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
+//           >
+//             {showCPw ? "🙈" : "👁️"}
+//           </button>
+//         </div>
+
+//         <FloatingInput
+//           label="Address"
+//           name="address"
+//           value={form.address}
+//           onChange={onChange}
+//           error={errors.address}
+//           autoComplete="street-address"
+//         />
+//         <FloatingInput
+//           label="Referral Code"
+//           name="referralCode"
+//           value={form.referralCode}
+//           onChange={onChange}
+//           error={errors.referralCode}
+//           readOnly={!!refCode}
+//         />
+
+//         {/* Placement Position */}
+//         <FloatingSelect
+//           label="Placement Position"
+//           name="placementPosition"
+//           value={form.placementPosition}
+//           onChange={onChange}
+//           options={[
+//             { value: "line one", label: "Line One" },
+//             { value: "line two", label: "Line Two" },
+//             { value: "line three", label: "Line Three" },
+//           ]}
+//           error={errors.placementPosition}
+//         />
+
+//         {/* Drag & Drop Image */}
+//         <div
+//           ref={dropRef}
+//           onDrop={onDrop}
+//           onDragOver={(e) => e.preventDefault()}
+//           className={`mt-2 p-4 border-2 border-dashed rounded-xl text-center ${
+//             errors.image ? "border-red-500" : "border-gray-300"
+//           }`}
+//         >
+//           <p className="mb-2">Drag & Drop profile image or click to select</p>
+//           <input
+//             id="imageUpload"
+//             type="file"
+//             accept="image/png,image/jpeg,image/webp"
+//             className="hidden"
+//             onChange={(e) => onPickImage(e.target.files?.[0])}
+//           />
+//           <label
+//             htmlFor="imageUpload"
+//             className="cursor-pointer bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition"
+//           >
+//             Select Image
+//           </label>
+//           {preview && (
+//             <div className="mt-3 flex justify-center">
+//               <Image
+//                 src={preview}
+//                 alt="Preview"
+//                 width={120}
+//                 height={120}
+//                 className="rounded-xl border object-cover"
+//               />
+//             </div>
+//           )}
+//           {errors.image && (
+//             <p className="text-xs text-red-500 mt-1">{errors.image}</p>
+//           )}
+//         </div>
+
+//         {/* Nominee Section */}
+//         <div className="border-t pt-4 space-y-4">
+//           <h3 className="text-lg font-semibold text-gray-700 mb-3">
+//             Nominee Information
+//           </h3>
+//           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+//             <FloatingInput
+//               label="Nominee First Name"
+//               name="nomineeFirstName"
+//               value={form.nomineeFirstName}
+//               onChange={onChange}
+//               error={errors.nomineeFirstName}
+//             />
+//             <FloatingInput
+//               label="Nominee Last Name"
+//               name="nomineeLastName"
+//               value={form.nomineeLastName}
+//               onChange={onChange}
+//               error={errors.nomineeLastName}
+//             />
+//           </div>
+
+//           <FloatingSelect
+//             label="Nominee Relation"
+//             name="nomineeRelation"
+//             value={form.nomineeRelation}
+//             onChange={onChange}
+//             options={[
+//               { value: "Father", label: "Father" },
+//               { value: "Mother", label: "Mother" },
+//               { value: "Brother", label: "Brother" },
+//               { value: "Sister", label: "Sister" },
+//               { value: "Spouse", label: "Spouse" },
+//               { value: "Child", label: "Child" },
+//               { value: "Relative", label: "Relative" },
+//               { value: "Other", label: "Other" },
+//             ]}
+//             error={errors.nomineeRelation}
+//           />
+//           <FloatingInput
+//             label="Nominee Phone (BD)"
+//             type="tel"
+//             name="nomineePhone"
+//             value={form.nomineePhone}
+//             onChange={onChange}
+//             error={errors.nomineePhone}
+//           />
+//           <FloatingInput
+//             label="Nominee Address"
+//             name="nomineeAddress"
+//             value={form.nomineeAddress}
+//             onChange={onChange}
+//             error={errors.nomineeAddress}
+//           />
+//         </div>
+
+//         {errors.submit && (
+//           <div className="rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
+//             {errors.submit}
+//           </div>
+//         )}
+
+//         <button
+//           type="submit"
+//           disabled={submitting}
+//           className="w-full py-3 rounded-xl bg-indigo-600 text-white font-semibold hover:bg-indigo-700 transition-all disabled:opacity-60"
+//         >
+//           {submitting ? "Registering..." : "Register"}
+//         </button>
+//       </form>
+//     </div>
+//   );
+// }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 "use client";
 
 import axios from "axios";
@@ -324,14 +1032,14 @@ export default function RegisterForm() {
             /> Deposit Registration
           </label>
 
-          <label>
+          {/* <label>
             <input
               type="radio"
               value="product"
               checked={form.registrationType === "product"}
               onChange={(e) => setForm({ ...form, registrationType: e.target.value })}
             /> Product Registration
-          </label>
+          </label> */}
         </div>
 
         {form.registrationType === "deposit" && (
@@ -388,70 +1096,70 @@ export default function RegisterForm() {
           </div>
         )} */}
 
-        {form.registrationType === "product" && (
-  <div className="space-y-2">
-    <label className="text-sm font-medium">Select Products</label>
+        {/* {form.registrationType === "product" && (
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Select Products</label>
 
-    {/* Selected Tags */}
-    <div className="flex flex-wrap gap-2 mb-2">
-      {form.productIds.map((id) => {
-        const product = products.find((p) => p._id === id);
-        if (!product) return null;
-        return (
-          <span
-            key={id}
-            className="flex items-center bg-indigo-100 text-indigo-700 px-2 py-1 rounded-full text-sm font-medium"
-          >
-            {product.name}
-            <button
-              type="button"
-              onClick={() =>
-                setForm({
-                  ...form,
-                  productIds: form.productIds.filter((pid) => pid !== id),
-                })
-              }
-              className="ml-1 text-indigo-500 font-bold hover:text-indigo-700 transition"
-            >
-              ×
-            </button>
-          </span>
-        );
-      })}
-    </div>
-
-    {/* Product List */}
-    <div className="border rounded-xl p-3 h-40 overflow-y-auto bg-white shadow-sm">
-      {products.length === 0 ? (
-        <p className="text-gray-400 text-sm">No products available</p>
-      ) : (
-        products.map((p) => {
-          const selected = form.productIds.includes(p._id);
-          return (
-            <div
-              key={p._id}
-              className={`flex items-center justify-between px-3 py-2 mb-1 rounded-lg cursor-pointer transition-all
-                ${selected ? "bg-indigo-100 text-indigo-700 font-semibold" : "hover:bg-gray-100"}`}
-              onClick={() => {
-                const newIds = selected
-                  ? form.productIds.filter((id) => id !== p._id)
-                  : [...form.productIds, p._id];
-                setForm({ ...form, productIds: newIds });
-              }}
-            >
-              <span>{p.name}</span>
-              {selected && <span className="text-indigo-500 font-bold">✔</span>}
+            Selected Tags
+            <div className="flex flex-wrap gap-2 mb-2">
+              {form.productIds.map((id) => {
+                const product = products.find((p) => p._id === id);
+                if (!product) return null;
+                return (
+                  <span
+                    key={id}
+                    className="flex items-center bg-indigo-100 text-indigo-700 px-2 py-1 rounded-full text-sm font-medium"
+                  >
+                    {product.name}
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setForm({
+                          ...form,
+                          productIds: form.productIds.filter((pid) => pid !== id),
+                        })
+                      }
+                      className="ml-1 text-indigo-500 font-bold hover:text-indigo-700 transition"
+                    >
+                      ×
+                    </button>
+                  </span>
+                );
+              })}
             </div>
-          );
-        })
-      )}
-    </div>
 
-    {errors.productIds && (
-      <p className="text-xs text-red-500">{errors.productIds}</p>
-    )}
-  </div>
-)}
+            Product List
+            <div className="border rounded-xl p-3 h-40 overflow-y-auto bg-white shadow-sm">
+              {products.length === 0 ? (
+                <p className="text-gray-400 text-sm">No products available</p>
+              ) : (
+                products.map((p) => {
+                  const selected = form.productIds.includes(p._id);
+                  return (
+                    <div
+                      key={p._id}
+                      className={`flex items-center justify-between px-3 py-2 mb-1 rounded-lg cursor-pointer transition-all
+                        ${selected ? "bg-indigo-100 text-indigo-700 font-semibold" : "hover:bg-gray-100"}`}
+                      onClick={() => {
+                        const newIds = selected
+                          ? form.productIds.filter((id) => id !== p._id)
+                          : [...form.productIds, p._id];
+                        setForm({ ...form, productIds: newIds });
+                      }}
+                    >
+                      <span>{p.name}</span>
+                      {selected && <span className="text-indigo-500 font-bold">✔</span>}
+                    </div>
+                  );
+                })
+              )}
+            </div>
+
+            {errors.productIds && (
+              <p className="text-xs text-red-500">{errors.productIds}</p>
+            )}
+          </div>
+        )} */}
 
 
 
@@ -686,4 +1394,3 @@ export default function RegisterForm() {
     </div>
   );
 }
-
