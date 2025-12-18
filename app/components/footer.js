@@ -5,7 +5,7 @@ import Link from "next/link";
 
 const Footer = () => {
   return (
-    <footer className="bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 text-gray-300 py-12 relative overflow-hidden">
+    <footer className="bg-white via-slate-900 to-slate-950 text-black py-12 relative overflow-hidden">
       {/* Glow Background Accent */}
       <div className="absolute inset-0 bg-gradient-to-r from-orange-500/10 via-cyan-500/10 to-orange-500/10 blur-3xl"></div>
 
@@ -19,7 +19,7 @@ const Footer = () => {
                 HaatSeba
               </h1>
             </Link>
-            <p className="mt-4 text-sm text-gray-400 leading-relaxed">
+            <p className="mt-4 text-sm text-black leading-relaxed">
               Your trusted online livestock marketplace. 
               Find cows, goats, camels and safe transportation services all in one place.
             </p>
@@ -27,7 +27,7 @@ const Footer = () => {
 
           {/* Contact */}
           <div>
-            <h3 className="text-lg font-semibold text-white mb-4">Contact Us</h3>
+            <h3 className="text-lg font-semibold text-black mb-4">Contact Us</h3>
             <p className="flex items-center text-sm mb-3">
               <MapPin className="w-4 h-4 text-orange-500 mr-2" />
               190/A/1A East Rampura, Dhaka 1219
@@ -49,7 +49,7 @@ const Footer = () => {
 
           {/* Social Links */}
           <div>
-            <h3 className="text-lg font-semibold text-white mb-4">Follow Us</h3>
+            <h3 className="text-lg font-semibold text-black mb-4">Follow Us</h3>
             <div className="flex space-x-5">
               <Link
                 href="https://facebook.com"
@@ -81,7 +81,7 @@ const Footer = () => {
 
         {/* Bottom Bar */}
         <div className="mt-10 border-t border-gray-700 pt-6 text-center">
-          <p className="text-xs sm:text-sm text-gray-400">
+          <p className="text-xs sm:text-sm text-black">
             © 2025 HaatSeba. All rights reserved.
           </p>
           <div className="mt-3 flex justify-center space-x-4 text-sm">

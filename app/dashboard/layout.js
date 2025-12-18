@@ -588,8 +588,8 @@ export default function DashboardLayout({ children }) {
         name: 'Joining Products',
         icon: Package,
         children: [
-          { name: 'Buy Joining Product', href: '/dashboard/agent/request', icon: ShoppingCart },
-          { name: 'My Joining Stock', href: '/dashboard/agent/stock', icon: Boxes },
+          { name: 'Buy Joining Product', href: '/dashboard/joining-product/request', icon: ShoppingCart },
+          { name: 'My Joining Stock', href: '/dashboard/joining-product/stock', icon: Boxes },
         ],
       },
       isVendor
@@ -893,7 +893,7 @@ export default function DashboardLayout({ children }) {
             >
               <Menu />
             </button>
-            <Link href="/dashboard/marketplace/shop" className="text-lg font-semibold text-gray-800 dark:text-gray-200">
+            <Link href="/" className="text-lg font-semibold text-gray-800 dark:text-gray-200">
               HaatSeba
             </Link>
           </div>

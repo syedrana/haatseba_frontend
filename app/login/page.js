@@ -50,15 +50,24 @@ export default function Login() {
       );
       const token = response.data.access_token;
       const role = response.data.role;
+      const name = response.data.name;
+      const image = response.data.image;
 
       localStorage.setItem("token", token);
       localStorage.setItem("userRole", role);
+      localStorage.setItem("userName", name);
+      localStorage.setItem("image", image);
+
+
+      console.log(response.data.image);
+      
+
 
       setFormData({ identifier: "", password: "" });
       setError("");
 
       if (role === "user") {
-        setTimeout(() => router.replace("/dashboard/marketplace/shop"), 500);
+        setTimeout(() => router.replace("/"), 500);
       } else router.replace("/login");
 
     } catch (err) {

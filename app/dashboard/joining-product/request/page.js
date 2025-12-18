@@ -335,8 +335,8 @@ export default function BecomeAgentPage() {
     <div className="max-w-7xl mx-auto p-4 md:p-8">
       <div className="flex flex-col md:flex-row justify-between items-start gap-4 mb-6">
         <div>
-          <h1 className="text-3xl font-bold">Become an Agent</h1>
-          <p className="text-gray-600 mt-1">Choose a package and complete checkout to activate your agent account.</p>
+          <h1 className="text-3xl font-bold">Buy joining product</h1>
+          <p className="text-gray-600 mt-1">Choose a package and complete checkout.</p>
         </div>
 
         <div className="hidden md:flex items-center gap-3">

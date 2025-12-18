@@ -85,22 +85,22 @@ const benefits = [
 
 const faqs = [
   {
-    q: "How can I sell on Daraz?",
+    q: "How can I sell on Haat Seba?",
     a:
       "To start selling, create an account on the Seller Center using your phone number, verify your email, add pickup address and upload required documents. After approval add your first product and start selling. Customize your store via the Store Builder.",
   },
   {
-    q: "What categories can I sell on Daraz?",
+    q: "What categories can I sell on Haat Seba?",
     a:
-      "Daraz supports multiple categories — fashion, electronics, FMCG, lifestyle and more. Avoid listing counterfeit, restricted or prohibited products. Check category rules on the Seller Center for details.",
+      "Haat Seba supports multiple categories — fashion, electronics, FMCG, lifestyle and more. Avoid listing counterfeit, restricted or prohibited products. Check category rules on the Seller Center for details.",
   },
   {
-    q: "How much commission does Daraz charge?",
+    q: "How much commission does Haat Seba charge?",
     a:
       "Opening a shop is free. Commission is deducted per order and varies by category. Promotional windows may offer reduced or 0% commission for new sellers. Refer to the commission schedule for category-specific rates.",
   },
   {
-    q: "What is the payment policy for Daraz?",
+    q: "What is the payment policy for Haat Seba?",
     a:
       "Payments are processed for orders marked as 'Delivered' and settled on a weekly schedule. If a payment date falls on a weekend or public holiday, disbursement occurs on the next business day.",
   },
@@ -277,7 +277,7 @@ export default function VendorRequestPage() {
 
 // bg-gradient-to-b from-slate-50 to-white
   return (
-    <div className="min-h-screen bg-gradient-to-b from-orange-50 via-white to-orange-100 dark:from-gray-900 dark:to-gray-800 p-6 md:p-12">
+    <div className="min-h-screen bg-gradient-to-b from-orange-50 via-white to-orange-100 dark:from-gray-900 dark:to-gray-800 mt-7 p-6 md:p-12">
       {/* HERO */}
       <header className="max-w-6xl mx-auto mb-8">
         <div className="bg-gradient-to-r from-orange-400 to-indigo-500 rounded-3xl shadow-xl p-8 md:p-12 text-white overflow-hidden relative">
