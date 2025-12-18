@@ -72,7 +72,7 @@ function PackageCard({ pkg, selected, onSelect }) {
                 </span>
               </div>
 
-              {/* Product Name */}
+              {/* Product Name dd  */}
               <div className="mt-1 text-sm font-medium truncate">{it.productId?.name || "Product"}</div>
 
               {/* Quantity */}
