@@ -14,7 +14,7 @@ import { Textarea } from "@/components/ui/textarea";
 import axios from "axios";
 import { Banknote, Building2, FileText, Loader2, Mail, MapPin, Phone, User } from "lucide-react";
 import Image from "next/image";
-import { useCallback, useEffect, useState } from "react";
+import { use, useCallback, useEffect, useState } from "react";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:7000";
 const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
@@ -24,7 +24,7 @@ export default function VendorRequestDetailPage({ params }) {
   const [loading, setLoading] = useState(true);
   const [openRejectModal, setOpenRejectModal] = useState(false);
   const [adminNote, setAdminNote] = useState("");
-  const id = params.id;
+  const { id } = use(params);
 
   // useEffect(() => {
   //   const fetchRequest = async () => {

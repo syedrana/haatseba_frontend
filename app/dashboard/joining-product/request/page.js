@@ -1,10 +1,11 @@
 "use client";
 
 import axios from "axios";
-import { Check, Minus, Plus, ShoppingCart, X } from "lucide-react";
-import Image from "next/image";
+import { Check, ShoppingCart } from "lucide-react";
 import React, { useEffect, useMemo, useState } from "react";
 import toast from "react-hot-toast";
+import CheckoutDrawer from "../../../components/package/CheckoutDrawer";
+import PackageCard from "../../../components/package/PackageCard";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "";
 
@@ -14,242 +15,16 @@ const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "";
 const formatCurrency = (v) =>
   typeof v === "number" ? `৳${v.toLocaleString("en-US")}` : v;
 
-
-
-/* -------------------------
-   ProductCard (premium)
-   ------------------------- */
-function PackageCard({ pkg, selected, onSelect }) {
-  return (
-    <article
-      onClick={() => onSelect(pkg)}
-      tabIndex={0}
-      onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === " ") onSelect(pkg);
-      }}
-      className={`cursor-pointer rounded-2xl border transition-shadow p-4 flex flex-col gap-3
-        ${selected ? "border-indigo-500 shadow-lg bg-indigo-50/60" : "border-gray-200 hover:shadow-md"}`}
-      aria-pressed={!!selected}
-      role="button"
-    >
-      {/* Header: Package Name + Price */}
-      <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold">{pkg.name}</h3>
-        <div className="text-xl font-bold text-indigo-600">{formatCurrency(pkg.price)}</div>
-      </div>
-
-      {/* Description */}
-      <div className="text-sm text-gray-600 line-clamp-3">{pkg.description || ""}</div>
-
-      {/* Products Section */}
-      <div className="mt-auto">
-        <div className="text-xs text-gray-500 mb-2">Includes</div>
-
-        {/* Horizontal Scrollable Product Cards */}
-        <div className="flex gap-3 overflow-x-auto pb-2">
-          {pkg.products?.map((it, idx) => (
-            <div
-              key={idx}
-              className="relative w-32 flex-shrink-0 rounded-lg overflow-hidden border bg-white shadow-sm hover:shadow-md transition p-2"
-            >
-              {/* Product Image */}
-              <div className="relative w-full h-24 rounded-lg overflow-hidden bg-gray-100">
-                {it.productId.image ? (
-                  <Image
-                    src={it.productId.image}
-                    alt={it.productId.name}
-                    fill
-                    className="object-cover"
-                  />
-                ) : (
-                  <div className="flex items-center justify-center h-full text-gray-400">
-                    No Image
-                  </div>
-                )}
-                {/* Type Tag */}
-                <span className="absolute top-1 left-1 bg-white/80 text-xs px-2 py-0.5 rounded-full font-medium">
-                  ৳ {it.productId.price || "Agent Pack"}
-                </span>
-              </div>
-
-              {/* Product Name dd  */}
-              <div className="mt-1 text-sm font-medium truncate">{it.productId?.name || "Product"}</div>
-
-              {/* Quantity */}
-              <div className="text-xs text-gray-500">x{it.quantity}</div>
-              <div className="text-xs text-gray-500">x{it.joining_quantity}</div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </article>
-  );
-}
-
-/* -------------------------
-   Checkout Drawer / Modal
-   ------------------------- */
-function CheckoutDrawer({
-  open,
-  onClose,
-  pkg,
-  qty,
-  setQty,
-  paymentType,
-  setPaymentType,
-  onConfirm,
-  loading,
-}) {
-  if (!open || !pkg) return null;
-
-  // responsive: on small screens take full screen, on md+ show side drawer
-  return (
-    <div
-      aria-modal="true"
-      role="dialog"
-      className="fixed inset-0 z-50 flex"
-    >
-      {/* backdrop */}
-      <div
-        onClick={onClose}
-        className="absolute inset-0 bg-black/40"
-        aria-hidden
-      />
-
-      {/* drawer */}
-      <div className="relative ml-auto w-full md:w-[420px] h-full bg-white p-5 overflow-auto">
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <h4 className="text-xl font-bold">Checkout</h4>
-            <div className="text-sm text-gray-500">You&apos;re buying: <span className="font-medium">{pkg.name}</span></div>
-          </div>
-
-          <button
-            onClick={onClose}
-            className="p-2 rounded hover:bg-gray-100"
-            aria-label="Close checkout"
-          >
-            <X size={18} />
-          </button>
-        </div>
-
-        <div className="mt-4 grid grid-cols-1 gap-4">
-          {/* package preview */}
-          <div className="flex gap-3 items-center">
-            <div>
-              <p className="font-semibold">{pkg.name}</p>
-              <p className="text-sm text-gray-500">{pkg.products?.length || 0} items included</p>
-              {pkg.products?.map((it, idx) => (
-                <div
-                  key={idx}
-                  className="relative w-full"
-                >
-                  <div className="mt-1 text-sm font-medium truncate">{it.productId?.name || "Product"} x{it.quantity}</div>
-                </div>
-              ))}
-              <p className="text-indigo-600 font-bold mt-1">{formatCurrency(pkg.price)}</p>
-            </div>
-          </div>
-
-          {/* qty control */}
-          <div>
-            <label className="text-sm font-medium">Quantity</label>
-            <div className="mt-2 inline-flex items-center gap-3">
-              <button
-                onClick={() => setQty(Math.max(1, qty - 1))}
-                className="px-3 py-1 border rounded"
-                aria-label="Decrease quantity"
-              >
-                <Minus size={16} />
-              </button>
-              <div className="min-w-[52px] text-center text-lg font-semibold">{qty}</div>
-              <button
-                onClick={() => setQty(qty + 1)}
-                className="px-3 py-1 border rounded"
-                aria-label="Increase quantity"
-              >
-                <Plus size={16} />
-              </button>
-            </div>
-            <div className="text-xs text-gray-500 mt-2">Available stock: <span className="font-medium">{pkg.stock ?? "—"}</span></div>
-          </div>
-
-          {/* payment type */}
-          <div>
-            <label className="text-sm font-medium">Payment</label>
-            <div className="mt-2 grid grid-cols-2 gap-2">
-              <button
-                onClick={() => setPaymentType("cod")}
-                className={`px-3 py-2 rounded border text-sm text-left ${paymentType === "cod" ? "bg-indigo-600 text-white border-indigo-600" : "bg-white"}`}
-              >
-                Cash on Delivery
-                <div className="text-xs text-white/80">{paymentType === "cod" ? "Selected" : ""}</div>
-              </button>
-
-              <button
-                onClick={() => setPaymentType("online")}
-                className={`px-3 py-2 rounded border text-sm text-left ${paymentType === "online" ? "bg-indigo-600 text-white border-indigo-600" : "bg-white"}`}
-              >
-                Online Payment
-                <div className="text-xs text-white/80">{paymentType === "online" ? "Selected" : ""}</div>
-              </button>
-            </div>
-          </div>
-
-          {/* order breakdown */}
-          <div className="border-t pt-4">
-            <div className="flex justify-between text-sm text-gray-600">
-              <span>Unit price</span>
-              <span>{formatCurrency(pkg.price)}</span>
-            </div>
-            <div className="flex justify-between text-sm text-gray-600 mt-1">
-              <span>Quantity</span>
-              <span>{qty}</span>
-            </div>
-            <div className="flex justify-between text-base font-semibold mt-3">
-              <span>Total</span>
-              <span>{formatCurrency(pkg.price * qty)}</span>
-            </div>
-            <div className="text-xs text-gray-500 mt-2">Taxes & shipping will be handled by admin (if applicable).</div>
-          </div>
-
-          {/* actions */}
-          <div className="flex gap-3 mt-4">
-            <button
-              onClick={onClose}
-              className="px-4 py-2 rounded border w-full"
-            >
-              Cancel
-            </button>
-
-            <button
-              onClick={onConfirm}
-              disabled={loading}
-              className="px-4 py-2 rounded bg-indigo-600 text-white w-full flex items-center justify-center gap-2"
-            >
-              {loading ? "Processing..." : (
-                <>
-                  <ShoppingCart size={16} /> Confirm & Pay
-                </>
-              )}
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 /* -------------------------
    Main Page (Ultra Pro UI)
    ------------------------- */
 export default function BecomeAgentPage() {
   
   const [pkgList, setPkgList] = useState([]);
+  const [walletBalance, setWalletBalance] = useState(0);
   const [loadingPackages, setLoadingPackages] = useState(false);
   const [selected, setSelected] = useState(null);
   const [qty, setQty] = useState(1);
-  const [paymentType, setPaymentType] = useState("cod");
   const [showDrawer, setShowDrawer] = useState(false);
   const [placing, setPlacing] = useState(false);
   const [error, setError] = useState("");
@@ -275,22 +50,32 @@ export default function BecomeAgentPage() {
     })();
   }, [token]);
 
+  // load wallet
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await axios.get(`${API_BASE}/getmywallet`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setWalletBalance(res.data?.wallet?.cashBalance || 0);
+      } catch (err) {
+        console.error(err);
+        setError("Failed to load wallet. Try again later.");
+      } 
+    })();
+  }, [token]);
+
   const handleSelect = (p) => {
     setSelected(p);
     setQty(1);
-    setPaymentType("cod");
     setShowDrawer(true);
     setError("");
   };
 
   const handleConfirm = async () => {
-    if (!selected) return setError("Select a package first.");
+    if (!selected) return toast.error("Select a package first");
+    if (!hasEnoughWallet) return toast.error("Insufficient wallet balance");
     if (!qty || qty < 1) return setError("Invalid quantity.");
-
-    // client-side stock check (optional)
-    if (selected.stock != null && qty > selected.stock) {
-      return setError("Quantity exceeds available stock.");
-    }
 
     setPlacing(true);
     setError("");
@@ -299,7 +84,7 @@ export default function BecomeAgentPage() {
       const payload = {
         packageId: selected._id,
         quantity: qty,
-        paymentType,
+        paymentType: "wallet",
       };
 
       const res = await axios.post(`${API_BASE}/placeagentorder`, payload, {
@@ -330,6 +115,11 @@ export default function BecomeAgentPage() {
   };
 
   const totalAmount = useMemo(() => (selected ? (selected.price * qty) : 0), [selected, qty]);
+  const hasEnoughWallet = useMemo(
+  () => walletBalance >= totalAmount,
+  [walletBalance, totalAmount]
+);
+
 
   return (
     <div className="max-w-7xl mx-auto p-4 md:p-8">
@@ -407,10 +197,9 @@ export default function BecomeAgentPage() {
         pkg={selected}
         qty={qty}
         setQty={setQty}
-        paymentType={paymentType}
-        setPaymentType={setPaymentType}
         onConfirm={handleConfirm}
         loading={placing}
+        walletBalance={walletBalance}
       />
 
       {/* success panel */}

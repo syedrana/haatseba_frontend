@@ -1,8 +1,10 @@
 "use client";
-import { ShoppingCart } from "lucide-react";
 import Image from "next/image";
 
-export default function ProductCard({ product }) {
+export default function ProductCard({ product,
+  selected,
+  onSelect,
+  onBuyNow, }) {
   return (
     <div className="bg-white rounded-2xl shadow-md hover:shadow-xl transition p-4">
       <div className="relative h-48 w-full">
@@ -34,8 +36,14 @@ export default function ProductCard({ product }) {
           )}
         </div>
 
-        <button className="bg-green-600 text-white px-3 py-2 rounded-xl hover:bg-green-700">
-          <ShoppingCart size={18} />
+        <button 
+            onClick={(e) => {
+            e.stopPropagation(); // ⭐ খুব জরুরি
+            onBuyNow();
+          }}
+          className="bg-green-600 text-white px-3 py-2 rounded-xl hover:bg-green-700"
+        >
+          Buy Now
         </button>
       </div>
     </div>
