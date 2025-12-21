@@ -566,6 +566,13 @@ export default function DashboardLayout({ children }) {
         ],
       },
       {
+        name: 'Top Up',
+        icon: Wallet,
+        children: [
+          { name: 'My Request', href: '/dashboard/topup/request', icon: Receipt },
+        ],
+      },
+      {
         name: 'MLM Integration',
         icon: Gift,
         children: [
