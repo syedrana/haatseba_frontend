@@ -709,9 +709,11 @@
 "use client";
 
 import axios from "axios";
+import { Wallet } from "lucide-react";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import AsyncProductSelect from "../components/agent/AsyncProductRegSelect";
 
 // ---------- Helpers ----------
 const bdPhoneOk = (v) => /^01[3-9]\d{8}$/.test(v || "");
@@ -815,9 +817,13 @@ export default function RegisterForm() {
     nomineePhone: "",
     nomineeAddress: "",
     placementPosition: "",
-    depositTransactionId: "", 
     registrationType: "deposit",
-    productIds: [],
+    productId: null,
+    productName: "",
+    productImage: "",
+    productPrice: 0,
+    qty: 0,               // agent stock
+    joining_quantity: 0,
   });
   const [showPw, setShowPw] = useState(false);
   const [showCPw, setShowCPw] = useState(false);
@@ -826,33 +832,53 @@ export default function RegisterForm() {
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
   const dropRef = useRef(null);
-  const [products, setProducts] = useState([]);
+  //const [products, setProducts] = useState([]);
+
+  const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "";
+  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+  const formatCurrency = (v) =>
+  typeof v === "number" ? `৳${v.toLocaleString("en-BD")}` : v;
+  const [walletBalance, setWalletBalance] = useState(0);
+  const REG_FEE = 20;
+  const hasEnoughBalance = walletBalance >= REG_FEE;
+  const insufficientStock =
+  form.registrationType === "product" &&
+  form.productId &&
+  typeof form.qty === "number" &&
+  typeof form.joining_quantity === "number" &&
+  form.qty < form.joining_quantity;
+  const totalPrice = form.productPrice && form.joining_quantity ? form.productPrice * form.joining_quantity : 0;
+  const productInvalid = form.registrationType === "product" && (!!errors.productId || insufficientStock);
+
+
 
   useEffect(() => {
-    const loadProducts = async () => {
+    (async () => {
       try {
-        const res = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE}/registerproduct`,
-          {
-            headers: {
-              Authorization: process.env.NEXT_PUBLIC_API_KEY,
-            },
-          }
-        );
-
-        setProducts(res.data.products || []);
+        const res = await axios.get(`${API_BASE}/getmywallet`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setWalletBalance(res.data?.wallet?.cashBalance || 0);
       } catch (err) {
-        console.error("Product load error:", err);
-      }
-    };
-
-    loadProducts();
-  }, []);
+        console.error(err);
+        setErrors("Failed to load wallet. Try again later.");
+      } 
+    })();
+  }, [token]);
 
   useEffect(() => {
     if (refCode) {
       setForm((prev) => ({ ...prev, referralCode: refCode }));
     }
   }, [refCode]);
+
+  useEffect(() => {
+    if (form.productId) {
+      setErrors((prev) => ({ ...prev, productId: null }));
+    }
+  }, [form.productId]);
+
+
 
   const onChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
@@ -886,16 +912,43 @@ export default function RegisterForm() {
     if (!bdPhoneOk(form.phone))
       e.phone = "Valid Bangladeshi phone (01[3-9]XXXXXXXX)";
     if (!form.password) e.password = "Password is required";
-    if (
-      form.password.length < 8 ||
-      form.password.length > 16 ||
-      !/[A-Z]/.test(form.password) ||
-      !/[0-9]/.test(form.password) ||
-      !/[^A-Za-z0-9]/.test(form.password) ||
-      /^\s|\s$/.test(form.password)
-    )
-      e.password =
-        "8–16 chars, 1 uppercase, 1 number, 1 symbol; no leading/trailing space";
+    // if (
+    //   form.password.length < 8 ||
+    //   form.password.length > 16 ||
+    //   !/[A-Z]/.test(form.password) ||
+    //   !/[0-9]/.test(form.password) ||
+    //   !/[^A-Za-z0-9]/.test(form.password) ||
+    //   /^\s|\s$/.test(form.password)
+    // )
+    //   e.password =
+    //     "8–16 chars, 1 uppercase, 1 number, 1 symbol; no leading/trailing space";
+    if (!form.placementPosition)
+      e.placementPosition = "Placement position is required";
+    if (form.registrationType === "product") {
+
+      if (!form.productId) {
+        e.productId = "Product required";
+      }
+
+      if (
+        typeof form.joining_quantity !== "number" ||
+        form.joining_quantity <= 0
+      ) {
+        e.productId = "Joining quantity not configured";
+      }
+
+      if (
+        typeof form.qty === "number" &&
+        typeof form.joining_quantity === "number" &&
+        form.qty < form.joining_quantity
+      ) {
+        e.productId = `Insufficient your stock. Available: ${form.qty}`;
+      }
+    }
+
+    if (!form.referralCode.trim())
+      e.referralCode = "Referred code is required";
+    if (!imgFile) e.image = "User image is required";
     if (form.confirmPassword !== form.password)
       e.confirmPassword = "Passwords do not match";
     if (!form.address.trim() || form.address.trim().length < 5)
@@ -907,16 +960,7 @@ export default function RegisterForm() {
       e.nomineePhone = "Valid nominee phone required";
     if (!form.nomineeAddress.trim())
       e.nomineeAddress = "Nominee address is required";
-    if (!form.placementPosition)
-      e.placementPosition = "Placement position is required";
-    if (form.registrationType === "deposit" && !form.depositTransactionId.trim())
-      e.depositTransactionId = "Transaction ID is required";
-    if (form.registrationType === "product" && form.productIds.length === 0) {
-      e.productIds = "Select at least one product";
-    } 
-    if (!form.referralCode.trim())
-      e.referralCode = "Referred code is required";
-    if (!imgFile) e.image = "User image is required";
+    
     return e;
   };
 
@@ -943,7 +987,9 @@ export default function RegisterForm() {
             "nomineeAddress",
           ].includes(key)
         ) {
-          formData.append(key, val.trim());
+          if (val !== null && val !== undefined) {
+            formData.append(key, typeof val === "string" ? val.trim() : val);
+          }
         }
       });
 
@@ -963,7 +1009,7 @@ export default function RegisterForm() {
         formData,
         {
           headers: {
-            Authorization: process.env.NEXT_PUBLIC_API_KEY,
+            Authorization: `Bearer ${token}`,
           },
           timeout: 90000,
         }
@@ -989,9 +1035,8 @@ export default function RegisterForm() {
         nomineePhone: "",
         nomineeAddress: "",
         placementPosition: "",
-        depositTransactionId: "",
         registrationType: "",
-        productIds: "",
+        productId: "",
       });
       setImgFile(null);
       setPreview(null);
@@ -1032,138 +1077,100 @@ export default function RegisterForm() {
             /> Deposit Registration
           </label>
 
-          {/* <label>
+          <label>
             <input
               type="radio"
               value="product"
               checked={form.registrationType === "product"}
               onChange={(e) => setForm({ ...form, registrationType: e.target.value })}
             /> Product Registration
-          </label> */}
+          </label>
         </div>
 
         {form.registrationType === "deposit" && (
-          <div>
-            {/* Payment Info */}
-            <div className="p-4 mb-6 rounded-lg bg-yellow-50 border border-yellow-300 text-yellow-800 text-sm">
-              <p>
-                Please <strong>Send Money</strong> your registration fee, <strong>BDT 20</strong> to the following official <strong>Personal BKash/Nagad/Rocket</strong> account:
-              </p>
-              <p className="text-lg font-semibold mt-1">📱 01304245543</p>
-              <p className="mt-1 text-gray-600">
-                After payment, enter your <strong>Transaction ID</strong> below.
-              </p>
+          <div className="border rounded p-3 bg-gray-50">
+            <div className="flex items-center justify-between text-sm">
+              <span className="flex items-center gap-1">
+                <Wallet size={14} /> Wallet Balance
+              </span>
+              <span className="font-semibold">
+                {formatCurrency(walletBalance)}
+              </span>
+            </div>
+            <div className="flex items-center justify-between text-sm">
+              <span className="flex items-center gap-1">
+                <Wallet size={14} /> Registration Fee
+              </span>
+              <span className="font-semibold">
+                {formatCurrency(REG_FEE)}
+              </span>
             </div>
             
-            {/* Transaction ID */}
-            <FloatingInput
-              label="Transaction ID"
-              name="depositTransactionId"
-              value={form.depositTransactionId}
-              onChange={onChange}
-              error={errors.depositTransactionId}
-            />
+            {!hasEnoughBalance && (
+              <div className="mt-1 text-xs text-red-600">
+                Insufficient wallet balance
+              </div>
+            )}
           </div>
         )}
 
+        {form.registrationType === "product" && (
+          <div className="md:col-span-6">
+            {productInvalid && (
+              <p className="mt-1 text-xs text-red-500">
+                {errors.productId || "Invalid product selection"}
+              </p>
+            )}
+            <AsyncProductSelect
+              value={form.productId ? { value: form.productId, label: form.productName, image: form.productImage } : null}
+              //onChange={(opt) => updateRow(form, { productId: opt.value, productName: opt.label, image: opt.image })}
+              token={token}
+              onChange={(opt) =>
+                setForm((prev) => ({
+                  ...prev,
+                  productId: opt.value,
+                  productName: opt.label,
+                  productImage: opt.image,
+                  productPrice: Number(opt.price),
+                  qty: Number(opt.qty),
+                  joining_quantity: Number(opt.joining_quantity),
+                }))
+              }
+              placeholder="Search product..."
+              hasError={productInvalid}
+            />
+
+            {form.productId && (
+              <div className="mt-1 text-xs">
+                {insufficientStock ? (
+                  <p className="text-red-600 font-semibold">
+                    ❌ Insufficient your stock. 
+                    Available: {form.qty} | Required: {form.joining_quantity}
+                  </p>
+                ) : (
+                  <>
+                    <p className="text-gray-600">
+                      Available Stock: {form.qty}
+                    </p>
+                    <p className="text-gray-600">
+                      Joining Quantity Required: {form.joining_quantity}
+                    </p>
+                    <p className="font-semibold text-indigo-600">
+                      Total Price: ৳ {totalPrice}
+                    </p>
+                  </>
+                )}
+              </div>
+            )}
+
+            {errors.productId && (
+              <p className="mt-1 text-xs text-red-500">
+                {errors.productId}
+              </p>
+            )}
+          </div>
+        )}
         
-
-        {/* {form.registrationType === "product" && (
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Select Products</label>
-
-            <div className="border rounded-xl p-3 h-40 overflow-y-auto">
-              <select
-                multiple
-                className="w-full h-full outline-none"
-                value={form.productIds}
-                onChange={(e) => {
-                  const values = [...e.target.selectedOptions].map((o) => o.value);
-                  setForm({ ...form, productIds: values });
-                }}
-              >
-                {products.map((p) => (
-                  <option key={p._id} value={p._id}>
-                    {p.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {errors.productIds && (
-              <p className="text-xs text-red-500">{errors.productIds}</p>
-            )}
-          </div>
-        )} */}
-
-        {/* {form.registrationType === "product" && (
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Select Products</label>
-
-            Selected Tags
-            <div className="flex flex-wrap gap-2 mb-2">
-              {form.productIds.map((id) => {
-                const product = products.find((p) => p._id === id);
-                if (!product) return null;
-                return (
-                  <span
-                    key={id}
-                    className="flex items-center bg-indigo-100 text-indigo-700 px-2 py-1 rounded-full text-sm font-medium"
-                  >
-                    {product.name}
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setForm({
-                          ...form,
-                          productIds: form.productIds.filter((pid) => pid !== id),
-                        })
-                      }
-                      className="ml-1 text-indigo-500 font-bold hover:text-indigo-700 transition"
-                    >
-                      ×
-                    </button>
-                  </span>
-                );
-              })}
-            </div>
-
-            Product List
-            <div className="border rounded-xl p-3 h-40 overflow-y-auto bg-white shadow-sm">
-              {products.length === 0 ? (
-                <p className="text-gray-400 text-sm">No products available</p>
-              ) : (
-                products.map((p) => {
-                  const selected = form.productIds.includes(p._id);
-                  return (
-                    <div
-                      key={p._id}
-                      className={`flex items-center justify-between px-3 py-2 mb-1 rounded-lg cursor-pointer transition-all
-                        ${selected ? "bg-indigo-100 text-indigo-700 font-semibold" : "hover:bg-gray-100"}`}
-                      onClick={() => {
-                        const newIds = selected
-                          ? form.productIds.filter((id) => id !== p._id)
-                          : [...form.productIds, p._id];
-                        setForm({ ...form, productIds: newIds });
-                      }}
-                    >
-                      <span>{p.name}</span>
-                      {selected && <span className="text-indigo-500 font-bold">✔</span>}
-                    </div>
-                  );
-                })
-              )}
-            </div>
-
-            {errors.productIds && (
-              <p className="text-xs text-red-500">{errors.productIds}</p>
-            )}
-          </div>
-        )} */}
-
-
-
-
         
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1385,7 +1392,11 @@ export default function RegisterForm() {
 
         <button
           type="submit"
-          disabled={submitting}
+          disabled={
+            submitting || 
+            (form.registrationType==="deposit" && !hasEnoughBalance)||
+            (form.registrationType === "product" && insufficientStock)
+          }
           className="w-full py-3 rounded-xl bg-indigo-600 text-white font-semibold hover:bg-indigo-700 transition-all disabled:opacity-60"
         >
           {submitting ? "Registering..." : "Register"}

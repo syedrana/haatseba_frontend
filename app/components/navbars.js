@@ -170,6 +170,23 @@ const Navbar = () => {
                     }`}
                   ></span>
                 </Link>
+                <Link
+                  href="/register"
+                  className={`relative group ${
+                    pathname === '/register'
+                      ? 'text-blue-500'
+                      : 'text-gray-700'
+                  }`}
+                >
+                  <span className="relative z-10">
+                    {createWaveEffect('User Registration')}
+                  </span>
+                  <span
+                    className={`absolute left-0 bottom-0 w-0 h-1 bg-orange-500 transition-all duration-300 group-hover:w-full ${
+                      pathname === '/register' ? 'w-full' : ''
+                    }`}
+                  ></span>
+                </Link>
               </>
             ) : (
               <>
@@ -200,21 +217,6 @@ const Navbar = () => {
                   <span
                     className={`absolute left-0 bottom-0 w-0 h-1 bg-orange-500 transition-all duration-300 group-hover:w-full ${
                       pathname === '/login' ? 'w-full' : ''
-                    }`}
-                  ></span>
-                </Link>
-                <Link
-                  href="/register"
-                  className={`relative group ${
-                    pathname === '/register' ? 'text-blue-500' : 'text-gray-700'
-                  }`}
-                >
-                  <span className="relative z-10">
-                    {createWaveEffect('Register')}
-                  </span>
-                  <span
-                    className={`absolute left-0 bottom-0 w-0 h-1 bg-orange-500 transition-all duration-300 group-hover:w-full ${
-                      pathname === '/register' ? 'w-full' : ''
                     }`}
                   ></span>
                 </Link>
@@ -339,6 +341,14 @@ const Navbar = () => {
                     Become a Vendor
                   </Link>
 
+                  <Link
+                    href="/register"
+                    onClick={() => setIsMenuOpen(false)}
+                    className="block py-2 text-gray-700 font-medium"
+                  >
+                    User Registration
+                  </Link>
+
                   <button
                     onClick={handleLogout}
                     className="w-full text-left py-2 text-red-600 font-medium"
@@ -356,14 +366,6 @@ const Navbar = () => {
                     className="block py-2 text-gray-700 font-medium"
                   >
                     Login
-                  </Link>
-
-                  <Link
-                    href="/register"
-                    onClick={() => setIsMenuOpen(false)}
-                    className="block py-2 text-gray-700 font-medium"
-                  >
-                    Register
                   </Link>
                 </>
               )}
