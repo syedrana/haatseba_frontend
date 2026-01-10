@@ -892,7 +892,7 @@ export default function DashboardLayout({ children }) {
 
       {/* MAIN CONTENT */}
       <div className="flex-1 flex flex-col bg-gray-100 dark:bg-gray-900">
-        <header className="flex justify-between items-center p-4 border-b bg-white dark:bg-gray-800">
+        <header className="flex justify-between items-center pl-6 border-b bg-white dark:bg-gray-800">
           <div className="flex items-center gap-2">
             <button
               onClick={() => setSidebarOpen(true)}
@@ -900,8 +900,19 @@ export default function DashboardLayout({ children }) {
             >
               <Menu />
             </button>
-            <Link href="/" className="text-lg font-semibold text-gray-800 dark:text-gray-200">
-              HaatSeba
+            <Link
+              href='/'
+            >
+              <div className="relative w-20 h-20 ">
+                <Image
+                  src="/yesmall.jpg"
+                  alt="Logo"
+                  fill
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 200px"
+                  className="object-contain"
+                  priority={true}
+                />
+              </div>
             </Link>
           </div>
           <button

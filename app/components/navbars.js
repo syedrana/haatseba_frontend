@@ -77,21 +77,20 @@ const Navbar = () => {
             <Link
               href='/'
             >
-              {/* <div className="relative w-40 h-40 sm:w-48 sm:h-48 md:w-56 md:h-56 lg:w-64 lg:h-64 xl:w-72 xl:h-72">
+              <div className="relative w-25 h-25 ">
                 <Image
-                  src="/trust1x.png"
+                  src="/yesmall.jpg"
                   alt="Logo"
                   fill
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 200px"
                   className="object-contain"
                   priority={true}
                 />
-              </div> */}
-              {/* <Image src="/trust1x.png" alt="Trust1x Logo" width={100} height={100} /> */}
+              </div>
             </Link>
-            <Link href="/">
+            {/* <Link href="/">
                <h1 className="text-3xl font-extrabold text-orange-600">HaatSeba</h1>
-            </Link>
+            </Link> */}
           </div>
           <div className="flex items-center md:hidden">
             <button
